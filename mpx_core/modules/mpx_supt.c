@@ -137,6 +137,27 @@ void sys_set_free(int (*func)(void *))
 }
 
 /*
+  Procedure..: cmd_handler
+
+*/
+
+void cmd_handler()
+{
+  char cmd_buffer[100];
+  int buffer_size;
+  int quit = 0;
+
+  char startup_msg[100] = "Welcome to OS Allstars' MPX. Enter help for a list of commands.";
+  sys_req(WRITE, DEFAULT_DEVICE, startup_msg, &buffer_size);
+  while(!quit)
+  {
+    //get a command
+    memset(cmd_buffer, '\0', 100);
+    buffer_size = 99; //reset size before each call to read
+    sys_req(READ, DEFAULT_DEVICE, cmd_buffer, &buffer_size);
+  }
+}
+/*
   Procedure..: sys_alloc_mem
   Description..: Allocates a block of memory (similar to malloc)
   Params..: Number of bytes to allocate
