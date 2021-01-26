@@ -64,7 +64,13 @@ void sys_set_malloc(u32int (*func)(u32int));
 */
 void sys_set_free(int (*func)(void *));
 
-
+/*
+  Procedure..:cmd_handler
+  Description..: Loop to handle commands that are returned from 
+  sys_req(Read) and other user needs
+  Params..: none
+*/
+void cmd_handler();
 
 /*
   Procedure..: sys_alloc_mem
