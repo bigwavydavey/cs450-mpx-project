@@ -10,6 +10,7 @@
 
 #include <core/io.h>
 #include <core/serial.h>
+#include <modules/mpx_supt.h>
 
 #define NO_ERROR 0
 
@@ -92,7 +93,20 @@ int *polling(char *buffer, int *count){
 // insert your code to gather keyboard input via the technique of polling.
 // You must validat each key and handle special keys such as delete, back space, and
 // arrow keys
-
+  int i=0;
+  while (1){
+    if (inb(COM1 + 5) & 1){
+      char letter = inb(COM1);
+      if (letter == 13){
+        buffer[i] = letter;
+        sys_req(WRITE, DEFAULT_DEVICE, (buffer + i), count);
+        break;
+      }
+      buffer[i] = letter;
+      sys_req(WRITE, DEFAULT_DEVICE, (buffer + i), count);
+      i++;
+    }
+  }
 // remove the following line after implementing your module, this is present
 // just to allow the program to compile before R1 is complete
 strlen(buffer);
