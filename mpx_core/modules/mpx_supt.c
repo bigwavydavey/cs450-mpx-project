@@ -141,6 +141,10 @@ void sys_set_free(int (*func)(void *))
   user commands. As commands increase in quantity and complexity this
   function will eventually call a host of other functions to handle
   tasks.
+    Currently implemented commands:
+    --help
+    --version
+    --shutdown
   Params..: none
 */
 
@@ -169,14 +173,31 @@ void cmd_handler()
       char current_version[60] = "\nOS Allstars' MPX Version 1.0, last updated Jan 29, 2021\n";
       sys_req(WRITE, DEFAULT_DEVICE, current_version, &buffer_size);
     }
-    //Quit command
+    //Shutdown command
     else if (strcmp(cmd_buffer, "shutdown\r") == 0)
     {
-      quit = 1; // exit cmd_handler
+      sys_req(WRITE, DEFAULT_DEVICE, "\nAre you sure you want to shutdown the system? (y/n)\n\n>>", &buffer_size);
+
+      char shutdown_buffer[10];
+      memset(shutdown_buffer, '\0', 10);
+      int shutdown_buffer_size = 9;
+      sys_req(READ, DEFAULT_DEVICE, shutdown_buffer, &shutdown_buffer_size);
+
+      if (strcmp(shutdown_buffer, "y\r") == 0)
+        quit = 1; //exits cmd_handler
+      else if (strcmp(shutdown_buffer, "n\r") == 0)
+      {
+        sys_req(WRITE, DEFAULT_DEVICE, "\nAborting shutdown...\n", &buffer_size);
+      }
+      else
+        sys_req(WRITE, DEFAULT_DEVICE, "\nInvalid input. Aborting shutdown...\n", &buffer_size);
     }
+
+    //Help command
     else if (strcmp(cmd_buffer, "help\r") == 0)
     {
       char help_msg[500] = "\nhelp: prints list of commands and explains their functionality\n";
+
       strcat(help_msg, "version: prints the current version of OS Allstars' MPX and most recent release date\n");
       strcat(help_msg, "shutdown: shutsdown the MPX system\n");
       strcat(help_msg, "getdate: prints current date as stored in MPX register\n");
@@ -185,12 +206,15 @@ void cmd_handler()
       strcat(help_msg, "settime -- [time]: sets a user input time of day to the register\n");
       sys_req(WRITE, DEFAULT_DEVICE, help_msg, &buffer_size);
     }
-    //else if (...) <-- other commands will look similar for help, dateandtime, etc.
+    /*Add subsequent commands below:
+    *TO DO for R1: dateandtime
+    */
 
     //Command not recognized
     else
     {
       char cmd_err_msg[100] = "\rInvalid input: ";
+
       strcat(cmd_err_msg, cmd_buffer);
       sys_req(WRITE, DEFAULT_DEVICE, cmd_err_msg, &buffer_size);
       sys_req(WRITE, DEFAULT_DEVICE, "MPX only recognizes certain commands.\nEnter help for list of commands or shutdown to exit MPX\n", &buffer_size);
