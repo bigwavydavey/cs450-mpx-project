@@ -19,6 +19,7 @@ int current_module = -1;
 static int io_module_active = 0;
 static int mem_module_active = 0;
 
+
 // If a student created heap manager is implemented this
 // is a pointer to the student's "malloc" operation.
 u32int (*student_malloc)(u32int);
@@ -114,8 +115,6 @@ void mpx_init(int cur_mod)
 		io_module_active = TRUE;
 }
 
-
-
 /*
   Procedure..: sys_set_malloc
   Description..: Sets the memory allocation function for sys_alloc_mem
@@ -138,7 +137,11 @@ void sys_set_free(int (*func)(void *))
 
 /*
   Procedure..: cmd_handler
-
+  Description..: This function has a loop to continuously handle specific
+  user commands. As commands increase in quantity and complexity this
+  function will eventually call a host of other functions to handle
+  tasks.
+  Params..: none
 */
 
 void cmd_handler()
@@ -147,16 +150,54 @@ void cmd_handler()
   int buffer_size;
   int quit = 0;
 
-  char startup_msg[100] = "Welcome to OS Allstars' MPX. Enter help for a list of commands.";
+  char startup_msg[100] = "\nWelcome to OS Allstars' MPX. Enter help for a list of commands.\n";
   sys_req(WRITE, DEFAULT_DEVICE, startup_msg, &buffer_size);
+ 
+  
   while(!quit)
   {
-    //get a command
+    //Fill cmd_buffer
+    sys_req(WRITE, DEFAULT_DEVICE, "\n>>", &buffer_size);
     memset(cmd_buffer, '\0', 100);
     buffer_size = 99; //reset size before each call to read
     sys_req(READ, DEFAULT_DEVICE, cmd_buffer, &buffer_size);
+
+      
+    //Version command
+    if (strcmp(cmd_buffer, "version\r") == 0) // see if buffer matches version command
+    {
+      char current_version[60] = "\nOS Allstars' MPX Version 1.0, last updated Jan 29, 2021\n";
+      sys_req(WRITE, DEFAULT_DEVICE, current_version, &buffer_size);
+    }
+    //Quit command
+    else if (strcmp(cmd_buffer, "shutdown\r") == 0)
+    {
+      quit = 1; // exit cmd_handler
+    }
+    else if (strcmp(cmd_buffer, "help\r") == 0)
+    {
+      char help_msg[500] = "\nhelp: prints list of commands and explains their functionality\n";
+      strcat(help_msg, "version: prints the current version of OS Allstars' MPX and most recent release date\n");
+      strcat(help_msg, "shutdown: shutsdown the MPX system\n");
+      strcat(help_msg, "getdate: prints current date as stored in MPX register\n");
+      strcat(help_msg, "setdate --[date]: sets a user input date to the register\n");
+      strcat(help_msg, "gettime: prints the current time of day as stored in MPX register\n");
+      strcat(help_msg, "settime -- [time]: sets a user input time of day to the register\n");
+      sys_req(WRITE, DEFAULT_DEVICE, help_msg, &buffer_size);
+    }
+    //else if (...) <-- other commands will look similar for help, dateandtime, etc.
+
+    //Command not recognized
+    else
+    {
+      char cmd_err_msg[100] = "\rInvalid input: ";
+      strcat(cmd_err_msg, cmd_buffer);
+      sys_req(WRITE, DEFAULT_DEVICE, cmd_err_msg, &buffer_size);
+      sys_req(WRITE, DEFAULT_DEVICE, "MPX only recognizes certain commands.\nEnter help for list of commands or shutdown to exit MPX\n", &buffer_size);
+    }
   }
 }
+
 /*
   Procedure..: sys_alloc_mem
   Description..: Allocates a block of memory (similar to malloc)
