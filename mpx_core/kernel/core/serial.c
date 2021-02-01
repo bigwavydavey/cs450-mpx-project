@@ -97,14 +97,23 @@ int *polling(char *buffer, int *count){
   while (1){
     if (inb(COM1 + 5) & 1){
       char letter = inb(COM1);
+      *count = 1;
       if (letter == 13){
         buffer[i] = letter;
         sys_req(WRITE, DEFAULT_DEVICE, (buffer + i), count);
         break;
       }
-      buffer[i] = letter;
-      sys_req(WRITE, DEFAULT_DEVICE, (buffer + i), count);
-      i++;
+      else if (letter == 127){
+        buffer[i] = '\0';
+        i--;
+        serial_print("\x1b[1D");
+        serial_print("\x1b[0K");
+      }
+      else{
+        buffer[i] = letter;
+        sys_req(WRITE, DEFAULT_DEVICE, (buffer + i), count);
+        i++;
+      }
     }
   }
 // remove the following line after implementing your module, this is present
