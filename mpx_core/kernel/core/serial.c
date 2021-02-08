@@ -88,22 +88,40 @@ int set_serial_in(int device)
   serial_port_in = device;
   return NO_ERROR;
 }
+/**
+* This function is used to navigate the user interface,
+* by taking in keyboard inputs, wrties them to the console
+* and stores the input in a buffer 
+*
+* @param  beffer: the buffer is a pointer to the character array 
+*                 in the command handler. The character array stores
+*                 character input from the user
+* @param  count: pointer to a integer size of the buffer used in sys_req
+* 
+*/
 
 int *polling(char *buffer, int *count){
-  int cursor_pos=0;
+  //instantiates position variables
+  int cursor_pos = 0;
   int num_characters = 0;
   int loop_control = 0;
   //start of polling loop
   while (1){
+    //if statement to check if key is pressed and stores value if so
     if (inb(COM1 + 5) & 1){
       char letter = inb(COM1);
+      // checks to see if enter key was pressed, if pressed break loop
       if (letter == 13){
         buffer[num_characters] = letter;
         serial_print(buffer + num_characters);
         break;
       }
+      // checks to see if backspace key is pressed.
       else if (letter == 127){
+        // checks to make sure the cursor is within the buffer
         if (cursor_pos > 0){
+          // checks to see if cursor is at the end of the array. if so, assign last known character to null 
+          //decrease the cursor position and number of characters and clear last written character from terminal
           if (cursor_pos == num_characters){
             buffer[cursor_pos] = '\0';
             cursor_pos--;
@@ -111,6 +129,8 @@ int *polling(char *buffer, int *count){
             serial_print("\x1b[1D");
             serial_print("\x1b[0K");
           }
+          //checks to see if cursor is in the middle of the buffer. If so, decrease cursor position and number of characters
+          // and move every character to the left one space until deleted character
           else{
             num_characters--;
             cursor_pos--;
@@ -128,7 +148,10 @@ int *polling(char *buffer, int *count){
           }
         }
       }
+      //checks to see if delete key was pressed
       else if (letter == 126){
+        // checks to see if cursor positon is in the middle of the buffer. If so delete character to the right of cursor position
+        // and move remaining characters left to fill deleted character
         if (cursor_pos != num_characters){
           loop_control = cursor_pos + 1;
           num_characters--;
@@ -143,21 +166,25 @@ int *polling(char *buffer, int *count){
           serial_print("\x1b[u");
         }
       }
+      // checks to see if any arrow keys are pressed
       else if (letter == 27){
         letter = inb(COM1);
         letter = inb(COM1);
+        // checks to see if left arrow key is pressed, if so move cursor position left as long as its greater than 0
         if (letter == 68){
           if (cursor_pos != 0){
             serial_print("\x1b[1D");
             cursor_pos--;
           }
         }
+        // checks to see if right arrow key is pressed, if so move cursor position right as long as its less than number of characters
         else if (letter == 67){
           if (cursor_pos != num_characters){
             serial_print("\x1b[1C");
             cursor_pos++;
           }
         }
+        // these make sure up and down arrow keys don't print to terminal
         else if (letter == 66){
 
         }
@@ -165,6 +192,7 @@ int *polling(char *buffer, int *count){
 
         }
       }
+      //stores character into buffer and prints character to the consle and increases cursor posiiton and number of characters
       else{
         if (cursor_pos == num_characters){
           buffer[num_characters] = letter;
