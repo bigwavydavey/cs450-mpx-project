@@ -90,35 +90,106 @@ int set_serial_in(int device)
 }
 
 int *polling(char *buffer, int *count){
-// insert your code to gather keyboard input via the technique of polling.
-// You must validat each key and handle special keys such as delete, back space, and
-// arrow keys
-  int i=0;
+  int cursor_pos=0;
+  int num_characters = 0;
+  int loop_control = 0;
+  //start of polling loop
   while (1){
     if (inb(COM1 + 5) & 1){
       char letter = inb(COM1);
-      *count = 1;
       if (letter == 13){
-        buffer[i] = letter;
-        sys_req(WRITE, DEFAULT_DEVICE, (buffer + i), count);
+        buffer[num_characters] = letter;
+        serial_print(buffer + num_characters);
         break;
       }
       else if (letter == 127){
-        buffer[i] = '\0';
-        i--;
-        serial_print("\x1b[1D");
-        serial_print("\x1b[0K");
+        if (cursor_pos > 0){
+          if (cursor_pos == num_characters){
+            buffer[cursor_pos] = '\0';
+            cursor_pos--;
+            num_characters--;
+            serial_print("\x1b[1D");
+            serial_print("\x1b[0K");
+          }
+          else{
+            num_characters--;
+            cursor_pos--;
+            loop_control = cursor_pos;
+            while (loop_control < num_characters){
+              buffer[loop_control] = buffer[loop_control + 1];
+              loop_control++;
+            }
+            buffer[num_characters] = '\0';
+            serial_print("\x1b[0K");
+            serial_print("\x1b[1D");
+            serial_print("\x1b[s");
+            serial_print(buffer + cursor_pos);
+            serial_print("\x1b[u");
+          }
+        }
+      }
+      else if (letter == 126){
+        if (cursor_pos != num_characters){
+          loop_control = cursor_pos + 1;
+          num_characters--;
+          while (loop_control < num_characters){
+            buffer[loop_control] = buffer[loop_control + 1];
+            loop_control++;
+          }
+          buffer[num_characters] = '\0';
+          serial_print("\x1b[0K");
+          serial_print("\x1b[s");
+          serial_print(buffer + cursor_pos);
+          serial_print("\x1b[u");
+        }
+      }
+      else if (letter == 27){
+        letter = inb(COM1);
+        letter = inb(COM1);
+        if (letter == 68){
+          if (cursor_pos != 0){
+            serial_print("\x1b[1D");
+            cursor_pos--;
+          }
+        }
+        else if (letter == 67){
+          if (cursor_pos != num_characters){
+            serial_print("\x1b[1C");
+            cursor_pos++;
+          }
+        }
+        else if (letter == 66){
+
+        }
+        else if (letter == 65){
+
+        }
       }
       else{
-        buffer[i] = letter;
-        sys_req(WRITE, DEFAULT_DEVICE, (buffer + i), count);
-        i++;
+        if (cursor_pos == num_characters){
+          buffer[num_characters] = letter;
+          serial_print(buffer + num_characters);
+        }
+        else {
+          loop_control = num_characters;
+          while (loop_control > cursor_pos) {
+            buffer[loop_control] = buffer[loop_control -1];
+            loop_control--;
+          }
+          buffer[cursor_pos] = letter;
+          serial_print("\x1b[0K");
+          serial_print("\x1b[s");
+          serial_print(buffer + cursor_pos);
+          serial_print("\x1b[u");
+          serial_print("\x1b[1C");
+        }
+        cursor_pos++;
+        num_characters++;
       }
     }
   }
 // remove the following line after implementing your module, this is present
 // just to allow the program to compile before R1 is complete
-strlen(buffer);
 
 return count;
 }
