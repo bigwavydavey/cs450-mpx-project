@@ -35,7 +35,7 @@ typedef struct {
   int *count_ptr;
 } param;
 
-/*
+/**
   Procedure..: sys_req
   Description..: Generate interrupt 60H
   Params..: int op_code one of (IDLE, EXIT, READ, WRITE)
@@ -43,14 +43,14 @@ typedef struct {
 int sys_req( int op_code, int device_id, char *buffer_ptr, 
 			int *count_ptr );
 
-/*
+/**
   Procedure..: mpx_init
   Description..: Initialize MPX support software
   Params..: int cur_mod (symbolic constants MODULE_R1, MODULE_R2, etc
 */
 void mpx_init(int cur_mod);
 
-/*
+/**
   Procedure..: sys_set_malloc
   Description..: Sets the memory allocation function for sys_alloc_mem
   Params..: Function pointer
@@ -64,29 +64,21 @@ void sys_set_malloc(u32int (*func)(u32int));
 */
 void sys_set_free(int (*func)(void *));
 
-/*
-  Procedure..:cmd_handler
-  Description..: Loop to handle commands that are returned from 
-  sys_req(Read) and other user needs
-  Params..: none
-*/
-void cmd_handler();
-
-/*
+/**
   Procedure..: sys_alloc_mem
   Description..: Allocates a block of memory (similar to malloc)
   Params..: Number of bytes to allocate
 */
 void *sys_alloc_mem(u32int size);
 
-/*
+/**
   Procedure..: sys_free_mem
   Description..: Frees memory
   Params..: Pointer to block of memory to free
 */
 int sys_free_mem(void *ptr);
 
-/*
+/**
   Procedure..: idle
   Description..: The idle process
   Params..: None
