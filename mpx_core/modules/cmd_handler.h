@@ -2,6 +2,14 @@
 #include <core/serial.h>
 #include <core/io.h>
 
+void settime(char* time_buffer, int time_buffer_size);
+
+void gettime();
+
+void setdate(char* date_buffer, int date_buffer_size);
+
+void getdate();
+
 void cmd_handler();
 
 /**
