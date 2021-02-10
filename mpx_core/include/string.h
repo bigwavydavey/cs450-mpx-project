@@ -59,4 +59,23 @@ char* strtok(char *s1, const char *s2);
 */
 int atoi(const char *s);
 
+/*
+  Procedure..: swap
+  Description..: Swap two characters, created for itoa()
+  Params..: char *x, char *y
+*/
+inline void swap(char *x, char *y);
+/*
+  Procedure..: reverse
+  Description..: Reverse the characters in an array, created for itoa()
+  Params..: char *buffer, int length
+*/
+char* reverse(char *buffer, int length);
+/*
+  Procedure..: itoa
+  Description..: Convert an integer to an ASCII String
+  Params..: int value, char* buffer, int base
+*/
+char* itoa(int value, char* buffer, int base);
+
 #endif

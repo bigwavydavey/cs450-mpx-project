@@ -47,26 +47,26 @@ char* strcpy(char *s1, const char *s2)
 */
 int atoi(const char *s)
 {
-  int res=0; 
+  int res=0;
    int charVal=0;
-   char sign = ' '; 
+   char sign = ' ';
    char c = *s;
-   
+
 
    while(isspace(&c)){ ++s; c = *s;} // advance past whitespace
 
-   
+
    if (*s == '-' || *s == '+') sign = *(s++); // save the sign
-   
-   
-   while(*s != '\0'){ 
+
+
+   while(*s != '\0'){
         charVal = *s - 48;
- 	res = res * 10 + charVal; 
+ 	res = res * 10 + charVal;
 	s++;
 
-   } 
+   }
 
-   
+
    if ( sign == '-') res=res * -1;
 
   return res; // return integer
@@ -198,6 +198,81 @@ char* strtok(char *s1, const char *s2)
   return s1;
 }
 
+/*
+  Procedure..: swap
+  Description..: Swap two characters, created for itoa()
+  Params..: char *x, char *y
+  Design for this function came from two websites:
+  Availability: techiedelight.com/implement-itoa-function-in-c/ & geeksforgeeks.org/implement-itoa/
+*/
+inline void swap(char *x, char *y)
+{
+  char t = *x;
+  *x = *y;
+  *y = t;
+}
+/*
+  Procedure..: reverse
+  Description..: Reverse the characters in an array, created for itoa()
+  Params..: char *buffer, int length
+  Design for this function came from two websites:
+  Availability: techiedelight.com/implement-itoa-function-in-c/ & geeksforgeeks.org/implement-itoa/
+*/
+char* reverse(char *buffer, int length)
+{
+  int start = 0;
+  int end = length - 1;
+  while (start < end)
+    swap(&buffer[start++], &buffer[end--]);
+
+  return buffer;
+}
+/*
+  Procedure..: atoi
+  Description..: Convert an integer to an ASCII string
+  Params..: int value, char* buffer, int base
+  Design for this function came from two websites:
+  Availability: techiedelight.com/implement-itoa-function-in-c/ & geeksforgeeks.org/implement-itoa/
+*/
+char* itoa(int value, char* buffer, int base)
+{
+  int i = 0;
+  int isNegative = 0;
+
+  if (base < 2 || base > 32)
+    return buffer;
+
+  if (value == 0)
+  {
+    buffer[i++] = '0';
+    buffer[i] = '\0';
+    return buffer;
+  }
+
+  if (value < 0 && base == 10)
+  {
+    isNegative = 1;
+    value = -value;
+  }
+
+  while (value != 0)
+  {
+    int rem = value % base;
+    buffer[i++] = (rem > 9)? (rem-10) + 'a' : rem + '0';
+    value = value/base;
+  }
+
+  if (isNegative)
+    buffer[i++] = '-';
+
+  buffer[i] = '\0';
+
+  reverse(buffer, i);
+
+  return buffer;
+}
+
+
 
 
 /* And finally....
@@ -210,7 +285,5 @@ char* strtok(char *s1, const char *s2)
      ...
      \infty) Or feel free to completely implement sprintf
              (Read the man Page: $ man sprintf)
-   int sprintf(char *str, const char *format, ...); 
+   int sprintf(char *str, const char *format, ...);
 */
-
-
