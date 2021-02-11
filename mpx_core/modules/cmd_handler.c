@@ -4,7 +4,6 @@
 #include "mpx_supt.h"
 #include "cmd_handler.h"
 int buffer_size = 99;
-
 /**
 * @brief This function is used to set the processor RTC's current time
 *
@@ -18,7 +17,8 @@ void settime(char* time_buffer, int time_buffer_size)
   sys_req(READ, DEFAULT_DEVICE, time_buffer, &time_buffer_size);
 
   if (strlen(time_buffer) > 10)
-    sys_req(WRITE, DEFAULT_DEVICE, "\nInvalid format. Aborting settime command...\n", &buffer_size);
+    sys_req(WRITE, DEFAULT_DEVICE, time_buffer, &time_buffer_size);
+    //sys_req(WRITE, DEFAULT_DEVICE, "\nInvalid format. Aborting settime command...\n", &time_buffer_size);
   else
   {
     char * hr_s = strtok(time_buffer, ":");
@@ -35,7 +35,7 @@ void settime(char* time_buffer, int time_buffer_size)
     unsigned int sec_BCD = (((sec / 10) << 4) | (sec % 10));
 
     if( (hr < 0) | (hr > 23) | (min < 0) | (min > 59) | (sec < 0) | (sec > 59))
-      sys_req(WRITE, DEFAULT_DEVICE, "\nInvalid numerical input. Aborting settime command...\n", &buffer_size);
+      sys_req(WRITE, DEFAULT_DEVICE, "\nInvalid numerical input. Aborting settime command...\n", &time_buffer_size);
     else
     {
       cli();
@@ -46,7 +46,8 @@ void settime(char* time_buffer, int time_buffer_size)
       outb(0x70, 0x00);
       outb(0x71, sec_BCD);
       sti();
-      sys_req(WRITE, DEFAULT_DEVICE, "\nNew time successfully set to register.\n", &buffer_size);
+
+      sys_req(WRITE, DEFAULT_DEVICE, "\nNew time successfully set to register.\n", &time_buffer_size);
     }
   }
 }
@@ -62,6 +63,7 @@ void settime(char* time_buffer, int time_buffer_size)
 void gettime()
 {
   int hr_BCD, min_BCD, sec_BCD;
+  int buffer = 20;
   char time[9] = "\0";
 
   outb(0x70, 0x04);
@@ -87,12 +89,12 @@ void gettime()
   strcat(time, ":");
   strcat(time, sec_s);
 
-  sys_req(WRITE, DEFAULT_DEVICE, "\nThe time is: ", &buffer_size);
-  sys_req(WRITE, DEFAULT_DEVICE, time, &buffer_size);
+  sys_req(WRITE, DEFAULT_DEVICE, "The time is: ", &buffer);
+  sys_req(WRITE, DEFAULT_DEVICE, time, &buffer);
 }
 
 /**
-* @brief This function is used to set the processor 
+* @brief This function is used to set the processor
          RTC's current date
 *
 * @param date_buffer: Full string representation of the date taken, unparsed or changed
@@ -100,12 +102,12 @@ void gettime()
 */
 void setdate(char* date_buffer, int date_buffer_size)
 {
-  int /*year_full, */year_dec, year_mil, month, day;
+  int year_full, year_dec, year_mil, month, day;
 
   sys_req(READ, DEFAULT_DEVICE, date_buffer, &date_buffer_size);
 
   if (strlen(date_buffer) > 11)
-    sys_req(WRITE, DEFAULT_DEVICE, "\nInvalid format. Aborting setdate command...\n", &buffer_size);
+    sys_req(WRITE, DEFAULT_DEVICE, "\nInvalid format. Aborting setdate command...\n", &date_buffer_size);
   else
   {
     char * month_s = strtok(date_buffer, "/");
@@ -113,13 +115,13 @@ void setdate(char* date_buffer, int date_buffer_size)
     char * year_s_init = strtok(NULL, "/");
     char year_mil_s[3] = {year_s_init[0], year_s_init[1], '\0'};
     char year_dec_s[3] = {year_s_init[2], year_s_init[3], '\0'};
-    //char year_full_s[5] = {year_s_init[0], year_s_init[1], year_s_init[2], year_s_init[3], '\0'};
+    char year_full_s[5] = {year_s_init[0], year_s_init[1], year_s_init[2], year_s_init[3], '\0'};
 
     month = atoi(month_s);
     day = atoi(day_s);
     year_mil = atoi(year_mil_s);
     year_dec = atoi(year_dec_s);
-    //year_full = atoi(year_full_s);
+    year_full = atoi(year_full_s);
 
     unsigned int month_BCD = (((month / 10) << 4) | (month % 10));
     unsigned int day_BCD = (((day / 10) << 4) | (day % 10));
@@ -127,24 +129,31 @@ void setdate(char* date_buffer, int date_buffer_size)
     unsigned int year_dec_BCD = (((year_dec / 10) << 4) | (year_dec % 10));
 
     if( (month <= 0) | (month > 12) | (day <= 0) | (day > 31) )
-      sys_req(WRITE, DEFAULT_DEVICE, "\nInvalid numerical input. Aborting setdate command...\n", &buffer_size);
+      sys_req(WRITE, DEFAULT_DEVICE, "\nInvalid date. Aborting setdate command...\n", &date_buffer_size);
     else if( (month == 2) && (day > 29) )
-      sys_req(WRITE, DEFAULT_DEVICE, "\nInvalid numerical input. Aborting setdate command...\n", &buffer_size);
-    /*else if( (strcmp(month_s, "02") == 0) && (strcmp(day_s, "29") == 0))
+      sys_req(WRITE, DEFAULT_DEVICE, "\nInvalid date. Aborting setdate command...\n", &date_buffer_size);
+    else if( (month == 2) && (day == 29) )
     {
-      serial_print("Feb 29th");
-      if(year_full % 400 == 0)
+      if( ((year_full % 4 == 0) && (year_full % 100 != 0)) || (year_full % 400 == 0) )
       {
-        if(year_full % 100 != 0)
-        {
-          if(year_full % 4 == 0)
-          {
-            serial_print("leap_year");
-          }
-        }
+        cli();
+        outb(0x70, 0x09);
+        outb(0x71, year_dec_BCD);
+        outb(0x70, 0x32);
+        outb(0x71, year_mil_BCD);
+        outb(0x70, 0x08);
+        outb(0x71, month_BCD);
+        outb(0x70, 0x07);
+        outb(0x71, day_BCD);
+        sti();
+
+        sys_req(WRITE, DEFAULT_DEVICE, "\nNew date successfully set to register.\n", &date_buffer_size);
       }
-        //sys_rep(WRITE, DEFAULT_DEVICE, "\nInvalid date, this year is not a leap year. Date set to 3/1 of the specified year.\n", &buffer_size);
-    }*/
+      else
+        sys_req(WRITE, DEFAULT_DEVICE, "\nInvalid date. Aborting setdate command...\n", &date_buffer_size);
+    }
+    else if( ((month == 4) || (month == 6) || (month == 9) || (month == 11)) && (day ==31) )
+      sys_req(WRITE, DEFAULT_DEVICE, "\nInvalid date. Aborting setdate command...\n", &date_buffer_size);
     else
     {
       cli();
@@ -157,7 +166,8 @@ void setdate(char* date_buffer, int date_buffer_size)
       outb(0x70, 0x07);
       outb(0x71, day_BCD);
       sti();
-      sys_req(WRITE, DEFAULT_DEVICE, "\nNew date successfully set to register.\n", &buffer_size);
+
+      sys_req(WRITE, DEFAULT_DEVICE, "\nNew date successfully set to register.\n", &date_buffer_size);
     }
   }
 }
@@ -173,7 +183,8 @@ void setdate(char* date_buffer, int date_buffer_size)
 void getdate()
 {
   int month_BCD, day_BCD, year_mil_BCD, year_dec_BCD;
-  char date[11] = "\0";
+  int buffer = 12;
+  char date[12] = "\0";
 
   outb(0x70, 0x08);
   month_BCD = inb(0x71);
@@ -211,12 +222,12 @@ void getdate()
   strcat(date, year_mil_s);
   strcat(date, year_dec_s);
 
-  sys_req(WRITE, DEFAULT_DEVICE, "\nThe date is: ", &buffer_size);
-  sys_req(WRITE, DEFAULT_DEVICE, date, &buffer_size);
+  sys_req(WRITE, DEFAULT_DEVICE, "The date is: ", &buffer);
+  sys_req(WRITE, DEFAULT_DEVICE, date, &buffer);
 }
 
 /**
-  
+
   @brief This function has a loop to continuously handle specific
   user commands. As commands increase in quantity and complexity this
   function will eventually call a host of other functions to handle
@@ -236,7 +247,7 @@ void getdate()
     --gettime: prints the current time, according to MPX registers
     --setdate: sets a user entered date to MPX registers
     --getdate: prints the current time, according to MPX registers
-  
+
   @param none
 
   @retval none
@@ -244,6 +255,7 @@ void getdate()
 void cmd_handler()
 {
   char cmd_buffer[100];
+  int buffer_size = 99;
   int quit = 0;
 
   char * startup_msg = "\nWelcome to OS Allstars' MPX. Enter help for a list of commands.\n";
@@ -290,7 +302,7 @@ void cmd_handler()
     {
       char * help_msg = "\nhelp: prints list of commands and explains their functionality\n";
 
-      strcat(help_msg, "\nversion: prints the current version of OS Allstars' MPX and most recent release date\n");
+      strcat(help_msg, "\nversion: prints the current version of OS Allstars' MPX and most recent\nrelease date\n");
       strcat(help_msg, "\nshutdown: shutsdown the MPX system> You will be asked for confirmation\n");
       strcat(help_msg, "\ngetdate: prints current date as stored in MPX register\n");
       strcat(help_msg, "\nsetdate: sets a user input date to the register\n");
@@ -301,11 +313,11 @@ void cmd_handler()
 
     else if (strcmp(cmd_buffer, "settime\r") == 0)
     {
-      sys_req(WRITE, DEFAULT_DEVICE, "\nPlease enter time in HH:MM:SS format\n", &buffer_size);
+      sys_req(WRITE, DEFAULT_DEVICE, "Please enter time in HH:MM:SS format\n", &buffer_size);
 
-      char time_buffer[9];
-      memset(time_buffer, '\0', 9);
-      int time_buffer_size = 8;
+      char time_buffer[10];
+      memset(time_buffer, '\0', 10);
+      int time_buffer_size = 9;
 
       settime(time_buffer, time_buffer_size);
     }
@@ -317,11 +329,11 @@ void cmd_handler()
 
     else if (strcmp(cmd_buffer, "setdate\r") == 0)
     {
-      sys_req(WRITE, DEFAULT_DEVICE, "Please enter time in MM/DD/YYYY format\n", &buffer_size);
+      sys_req(WRITE, DEFAULT_DEVICE, "\nPlease enter time in MM/DD/YYYY format\n", &buffer_size);
 
-      char date_buffer[11];
-      memset(date_buffer, '\0', 11);
-      int date_buffer_size = 10;
+      char date_buffer[12];
+      memset(date_buffer, '\0', 12);
+      int date_buffer_size = 11;
 
       setdate(date_buffer, date_buffer_size);
     }
@@ -334,7 +346,8 @@ void cmd_handler()
     //Command not recognized
     else
     {
-      char * cmd_err_msg = "\nInvalid command: ";
+      char * cmd_err_msg = "\nInvalid input: ";
+
       sys_req(WRITE, DEFAULT_DEVICE, cmd_err_msg, &buffer_size);
       sys_req(WRITE, DEFAULT_DEVICE, cmd_buffer, &buffer_size);
       sys_req(WRITE, DEFAULT_DEVICE, "\nMPX only recognizes certain commands.\nEnter help for list of commands or shutdown to exit MPX\n", &buffer_size);
