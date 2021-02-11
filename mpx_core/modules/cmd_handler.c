@@ -46,9 +46,8 @@ void settime(char* time_buffer, int time_buffer_size)
       outb(0x70, 0x00);
       outb(0x71, sec_BCD);
       sti();
+      sys_req(WRITE, DEFAULT_DEVICE, "\nNew time successfully set to register.\n", &buffer_size);
     }
-
-    sys_req(WRITE, DEFAULT_DEVICE, "\nNew time successfully set to register.\n", &buffer_size);
   }
 }
 
@@ -88,7 +87,7 @@ void gettime()
   strcat(time, ":");
   strcat(time, sec_s);
 
-  sys_req(WRITE, DEFAULT_DEVICE, "The time is: ", &buffer_size);
+  sys_req(WRITE, DEFAULT_DEVICE, "\nThe time is: ", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, time, &buffer_size);
 }
 
@@ -158,9 +157,8 @@ void setdate(char* date_buffer, int date_buffer_size)
       outb(0x70, 0x07);
       outb(0x71, day_BCD);
       sti();
+      sys_req(WRITE, DEFAULT_DEVICE, "\nNew date successfully set to register.\n", &buffer_size);
     }
-
-    sys_req(WRITE, DEFAULT_DEVICE, "\nNew date successfully set to register.\n", &buffer_size);
   }
 }
 
@@ -213,7 +211,7 @@ void getdate()
   strcat(date, year_mil_s);
   strcat(date, year_dec_s);
 
-  sys_req(WRITE, DEFAULT_DEVICE, "The date is: ", &buffer_size);
+  sys_req(WRITE, DEFAULT_DEVICE, "\nThe date is: ", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, date, &buffer_size);
 }
 
@@ -336,11 +334,10 @@ void cmd_handler()
     //Command not recognized
     else
     {
-      char * cmd_err_msg = "\rInvalid input: ";
-
-      strcat(cmd_err_msg, cmd_buffer);
+      char * cmd_err_msg = "\nInvalid command: ";
       sys_req(WRITE, DEFAULT_DEVICE, cmd_err_msg, &buffer_size);
-      sys_req(WRITE, DEFAULT_DEVICE, "MPX only recognizes certain commands.\nEnter help for list of commands or shutdown to exit MPX\n", &buffer_size);
+      sys_req(WRITE, DEFAULT_DEVICE, cmd_buffer, &buffer_size);
+      sys_req(WRITE, DEFAULT_DEVICE, "\nMPX only recognizes certain commands.\nEnter help for list of commands or shutdown to exit MPX\n", &buffer_size);
     }
   }
 }
