@@ -239,7 +239,7 @@ void cmd_handler()
   while(!quit)
   {
     //Fill cmd_buffer
-    sys_req(WRITE, DEFAULT_DEVICE, "\n>>", &buffer_size);
+    sys_req(WRITE, DEFAULT_DEVICE, "\n>> ", &buffer_size);
     memset(cmd_buffer, '\0', 100);
     buffer_size = 99; //reset size before each call to read
     sys_req(READ, DEFAULT_DEVICE, cmd_buffer, &buffer_size);
