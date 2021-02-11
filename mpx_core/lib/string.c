@@ -198,12 +198,19 @@ char* strtok(char *s1, const char *s2)
   return s1;
 }
 
-/*
-  Procedure..: swap
-  Description..: Swap two characters, created for itoa()
-  Params..: char *x, char *y
-  Design for this function came from two websites:
-  Availability: techiedelight.com/implement-itoa-function-in-c/ & geeksforgeeks.org/implement-itoa/
+/**
+  @brief Swap two characters within two distinct string, 
+         created for use within itoa()
+         Design for this function came from two websites:
+         Title: Implement itoa() function in C
+         Last Updated : 29 May, 2017 
+         Availability: techiedelight.com/implement-itoa-function-in-c/ 
+         & geeksforgeeks.org/implement-itoa/
+  @param char *x: pointer to first character to be swapped
+  @param char *y: pointer to second character to be swaped
+
+  @retval none
+  
 */
 inline void swap(char *x, char *y)
 {
@@ -211,12 +218,18 @@ inline void swap(char *x, char *y)
   *x = *y;
   *y = t;
 }
-/*
-  Procedure..: reverse
-  Description..: Reverse the characters in an array, created for itoa()
-  Params..: char *buffer, int length
-  Design for this function came from two websites:
-  Availability: techiedelight.com/implement-itoa-function-in-c/ & geeksforgeeks.org/implement-itoa/
+/**
+  @brief Reverse the order of characters in an array, created for use
+         within itoa()
+         Design for this function came from two websites:
+         Title: Implement itoa() function in C
+         Last Updated : 29 May, 2017 
+         Availability: techiedelight.com/implement-itoa-function-in-c/ 
+         & geeksforgeeks.org/implement-itoa/
+  @param char *buffer: pointer to buffer to be reversed in order
+  @param int length: length of buffer
+
+  @retval buffer: buffer in reversed order
 */
 char* reverse(char *buffer, int length)
 {
@@ -227,12 +240,19 @@ char* reverse(char *buffer, int length)
 
   return buffer;
 }
-/*
-  Procedure..: atoi
-  Description..: Convert an integer to an ASCII string
-  Params..: int value, char* buffer, int base
-  Design for this function came from two websites:
-  Availability: techiedelight.com/implement-itoa-function-in-c/ & geeksforgeeks.org/implement-itoa/
+/**
+  @brief Convert an integer to an ASCII string
+         Design for this function came from two websites:
+         Title: Implement itoa() function in C
+         Last Updated : 29 May, 2017 
+         Availability: techiedelight.com/implement-itoa-function-in-c/ 
+         & geeksforgeeks.org/implement-itoa/
+
+  @param  int value: int data type to be converted
+  @param  char* buffer: pointer to destination for converted string 
+  @param  int base: number base to convert to (2 for binary, 10 for decimal, etc.)
+
+  @retval buffer: converted string
 */
 char* itoa(int value, char* buffer, int base)
 {

@@ -2,8 +2,8 @@
 #include <core/serial.h>
 #include <core/io.h>
 
-/*
-* This function is used to set the processor RTC's current time
+/**
+* @brief This function is used to set the processor RTC's current time
 *
 * @param date_buffer: Full string representation of the time taken, unparsed or changed
 * @param date_buffer_size: Size of the input string
@@ -49,8 +49,8 @@ void settime(char* time_buffer, int time_buffer_size)
   }
 }
 
-/*
-* This function is used to get the processor RTC's current time and print
+/**
+* @brief This function is used to get the processor RTC's current time and print
 * it to the window
 *
 * @param None
@@ -89,8 +89,9 @@ void gettime()
   sys_req(WRITE, DEFAULT_DEVICE, time, &buffer_size);
 }
 
-/*
-* This function is used to set the processor RTC's current date
+/**
+* @brief This function is used to set the processor 
+         RTC's current date
 *
 * @param date_buffer: Full string representation of the date taken, unparsed or changed
 * @param date_buffer_size: Size of the input string
@@ -160,9 +161,9 @@ void setdate(char* date_buffer, int date_buffer_size)
   }
 }
 
-/*
-* This function is used to get the processor RTC's current date and print
-* it to the window
+/**
+* @brief This function is used to get the processor RTC's current date and print
+*        it to the window
 *
 * @param None
 *
@@ -214,25 +215,38 @@ void getdate()
 }
 
 /**
-  Procedure..: cmd_handler
-  Description..: This function has a loop to continuously handle specific
+  
+  @brief This function has a loop to continuously handle specific
   user commands. As commands increase in quantity and complexity this
   function will eventually call a host of other functions to handle
-  tasks.
+  tasks. User commands are entered in a fashion similar to Linux
+  command line. For example--
+
+  @code
+    >>help
+  @endcode
+
+  would be the correct way to issue to "help command".
     Currently implemented commands:
     --help
-    --version
-    --shutdown
-    --settime
-  Params..: none
+    --version: provides user with current version of MPX
+    --shutdown: begins shutdown of MPX
+    --settime: sets a user entered time to MPX registers
+    --gettime: prints the current time, according to MPX registers
+    --setdate: sets a user entered date to MPX registers
+    --getdate: prints the current time, according to MPX registers
+  
+  @param none
+
+  @retval none
 */
 void cmd_handler()
 {
   char cmd_buffer[100];
-  int buffer_size;
+  int buffer_size = 99;
   int quit = 0;
 
-  char startup_msg[100] = "\nWelcome to OS Allstars' MPX. Enter help for a list of commands.\n";
+  char * startup_msg = "\nWelcome to OS Allstars' MPX. Enter help for a list of commands.\n";
   sys_req(WRITE, DEFAULT_DEVICE, startup_msg, &buffer_size);
 
 
@@ -248,7 +262,7 @@ void cmd_handler()
     //Version command
     if (strcmp(cmd_buffer, "version\r") == 0) // see if buffer matches version command
     {
-      char current_version[60] = "\nOS Allstars' MPX Version 1.0, last updated Jan 29, 2021\n";
+      char * current_version = "\nOS Allstars' MPX Version 1.0, last updated Feb 11, 2021\n";
       sys_req(WRITE, DEFAULT_DEVICE, current_version, &buffer_size);
     }
     //Shutdown command
@@ -274,20 +288,20 @@ void cmd_handler()
     //Help command
     else if (strcmp(cmd_buffer, "help\r") == 0)
     {
-      char help_msg[500] = "\nhelp: prints list of commands and explains their functionality\n";
+      char * help_msg = "\nhelp: prints list of commands and explains their functionality\n";
 
-      strcat(help_msg, "version: prints the current version of OS Allstars' MPX and most recent release date\n");
-      strcat(help_msg, "shutdown: shutsdown the MPX system\n");
-      strcat(help_msg, "getdate: prints current date as stored in MPX register\n");
-      strcat(help_msg, "setdate --[date]: sets a user input date to the register\n");
-      strcat(help_msg, "gettime: prints the current time of day as stored in MPX register\n");
-      strcat(help_msg, "settime -- [time]: sets a user input time of day to the register\n");
+      strcat(help_msg, "\nversion: prints the current version of OS Allstars' MPX and most recent release date\n");
+      strcat(help_msg, "\nshutdown: shutsdown the MPX system> You will be asked for confirmation\n");
+      strcat(help_msg, "\ngetdate: prints current date as stored in MPX register\n");
+      strcat(help_msg, "\nsetdate: sets a user input date to the register\n");
+      strcat(help_msg, "\ngettime: prints the current time of day as stored in MPX register\n");
+      strcat(help_msg, "\nsettime: sets a user input time of day to the register\n");
       sys_req(WRITE, DEFAULT_DEVICE, help_msg, &buffer_size);
     }
 
     else if (strcmp(cmd_buffer, "settime\r") == 0)
     {
-      sys_req(WRITE, DEFAULT_DEVICE, "Please enter time in HH:MM:SS format\n", &buffer_size);
+      sys_req(WRITE, DEFAULT_DEVICE, "\nPlease enter time in HH:MM:SS format\n", &buffer_size);
 
       char time_buffer[9];
       memset(time_buffer, '\0', 9);
@@ -320,7 +334,7 @@ void cmd_handler()
     //Command not recognized
     else
     {
-      char cmd_err_msg[100] = "\rInvalid input: ";
+      char * cmd_err_msg = "\rInvalid input: ";
 
       strcat(cmd_err_msg, cmd_buffer);
       sys_req(WRITE, DEFAULT_DEVICE, cmd_err_msg, &buffer_size);

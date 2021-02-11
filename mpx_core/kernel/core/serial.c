@@ -97,6 +97,8 @@ int set_serial_in(int device)
 *                 in the command handler. The character array stores
 *                 character input from the user
 * @param  count: pointer to a integer size of the buffer used in sys_req
+
+  @retval count: point to integer size of the buffer used in sys_req
 * 
 */
 
