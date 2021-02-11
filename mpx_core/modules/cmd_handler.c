@@ -106,7 +106,7 @@ void setdate(char* date_buffer, int date_buffer_size)
 
   sys_req(READ, DEFAULT_DEVICE, date_buffer, &date_buffer_size);
 
-  if (strlen(date_buffer) > 11)
+  if (strlen(date_buffer) > 12)
     sys_req(WRITE, DEFAULT_DEVICE, "\nInvalid format. Aborting setdate command...\n", &date_buffer_size);
   else
   {
