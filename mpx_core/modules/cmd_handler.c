@@ -17,7 +17,7 @@ void settime(char* time_buffer, int time_buffer_size)
 
   sys_req(READ, DEFAULT_DEVICE, time_buffer, &time_buffer_size);
 
-  if (strlen(time_buffer) > 9)
+  if (strlen(time_buffer) > 10)
     sys_req(WRITE, DEFAULT_DEVICE, "\nInvalid format. Aborting settime command...\n", &buffer_size);
   else
   {
