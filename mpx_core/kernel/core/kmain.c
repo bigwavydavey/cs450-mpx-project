@@ -22,7 +22,7 @@
 #include <mem/paging.h>
 
 #include "modules/mpx_supt.h"
-#include "modules/cmd_handler.c"
+#include "modules/cmd_handler.h"
 
 
 void kmain(void)

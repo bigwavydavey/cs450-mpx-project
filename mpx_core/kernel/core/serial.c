@@ -111,6 +111,9 @@ int *polling(char *buffer, int *count){
   while (1){
     //if statement to check if key is pressed and stores value if so
     if (inb(COM1 + 5) & 1){
+      if (num_characters == 99){
+        serial_print("ERROR: Entered in too many characters");
+      }
       char letter = inb(COM1);
       // checks to see if enter key was pressed, if pressed break loop
       if (letter == 13){
@@ -155,7 +158,7 @@ int *polling(char *buffer, int *count){
         // checks to see if cursor positon is in the middle of the buffer. If so delete character to the right of cursor position
         // and move remaining characters left to fill deleted character
         if (cursor_pos != num_characters){
-          loop_control = cursor_pos + 1;
+          loop_control = cursor_pos;
           num_characters--;
           while (loop_control < num_characters){
             buffer[loop_control] = buffer[loop_control + 1];

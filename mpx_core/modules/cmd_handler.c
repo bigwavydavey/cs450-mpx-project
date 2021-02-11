@@ -1,6 +1,9 @@
 #include <string.h>
 #include <core/serial.h>
 #include <core/io.h>
+#include "mpx_supt.h"
+#include "cmd_handler.h"
+int buffer_size = 99;
 
 /**
 * @brief This function is used to set the processor RTC's current time
@@ -98,7 +101,7 @@ void gettime()
 */
 void setdate(char* date_buffer, int date_buffer_size)
 {
-  int year_full, year_dec, year_mil, month, day;
+  int /*year_full, */year_dec, year_mil, month, day;
 
   sys_req(READ, DEFAULT_DEVICE, date_buffer, &date_buffer_size);
 
@@ -111,13 +114,13 @@ void setdate(char* date_buffer, int date_buffer_size)
     char * year_s_init = strtok(NULL, "/");
     char year_mil_s[3] = {year_s_init[0], year_s_init[1], '\0'};
     char year_dec_s[3] = {year_s_init[2], year_s_init[3], '\0'};
-    char year_full_s[5] = {year_s_init[0], year_s_init[1], year_s_init[2], year_s_init[3], '\0'};
+    //char year_full_s[5] = {year_s_init[0], year_s_init[1], year_s_init[2], year_s_init[3], '\0'};
 
     month = atoi(month_s);
     day = atoi(day_s);
     year_mil = atoi(year_mil_s);
     year_dec = atoi(year_dec_s);
-    year_full = atoi(year_full_s);
+    //year_full = atoi(year_full_s);
 
     unsigned int month_BCD = (((month / 10) << 4) | (month % 10));
     unsigned int day_BCD = (((day / 10) << 4) | (day % 10));
@@ -243,7 +246,6 @@ void getdate()
 void cmd_handler()
 {
   char cmd_buffer[100];
-  int buffer_size = 99;
   int quit = 0;
 
   char * startup_msg = "\nWelcome to OS Allstars' MPX. Enter help for a list of commands.\n";
