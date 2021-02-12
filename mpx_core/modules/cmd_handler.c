@@ -299,18 +299,15 @@ void cmd_handler()
 
     //Help command
     else if (strcmp(cmd_buffer, "help\r") == 0)
-    {
-      char * help_msg = "\nhelp: prints list of commands and explains their functionality\n";
-
-      strcat(help_msg, "\nversion: prints the current version of OS Allstars' MPX and most recent\nrelease date\n");
-      strcat(help_msg, "\nshutdown: shutsdown the MPX system> You will be asked for confirmation\n");
-      strcat(help_msg, "\ngetdate: prints current date as stored in MPX register\n");
-      strcat(help_msg, "\nsetdate: sets a user input date to the register\n");
-      strcat(help_msg, "\ngettime: prints the current time of day as stored in MPX register\n");
-      strcat(help_msg, "\nsettime: sets a user input time of day to the register\n");
-      sys_req(WRITE, DEFAULT_DEVICE, help_msg, &buffer_size);
+    { 
+      sys_req(WRITE, DEFAULT_DEVICE, "\nhelp: prints list of commands and explains their functionality\n", &buffer_size);
+      sys_req(WRITE, DEFAULT_DEVICE, "\nversion: prints the current version of OS Allstars' MPX and most recent\nrelease date\n", &buffer_size);
+      sys_req(WRITE, DEFAULT_DEVICE,  "\nshutdown: shutsdown the MPX system. You will be asked for confirmation\n", &buffer_size);
+      sys_req(WRITE, DEFAULT_DEVICE, "\ngetdate: prints current date as stored in MPX register\n", &buffer_size);
+      sys_req(WRITE, DEFAULT_DEVICE, "\nsetdate: sets a user input date to the register\n", &buffer_size);
+      sys_req(WRITE, DEFAULT_DEVICE, "\ngettime: prints the current time of day as stored in MPX register\n", &buffer_size);
+      sys_req(WRITE, DEFAULT_DEVICE, "\nsettime: sets a user input time of day to the register\n", &buffer_size);
     }
-
     else if (strcmp(cmd_buffer, "settime\r") == 0)
     {
       sys_req(WRITE, DEFAULT_DEVICE, "Please enter time in HH:MM:SS format\n", &buffer_size);
