@@ -111,8 +111,10 @@ int *polling(char *buffer, int *count){
   while (1){
     //if statement to check if key is pressed and stores value if so
     if (inb(COM1 + 5) & 1){
+      //serial_print("\x1b[6n");
       if (num_characters == 99){
-        serial_print("ERROR: Entered in too many characters");
+        serial_println("\nERROR: Entered in too many characters");
+        break;
       }
       char letter = inb(COM1);
       // checks to see if enter key was pressed, if pressed break loop
