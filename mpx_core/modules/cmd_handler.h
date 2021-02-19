@@ -12,6 +12,8 @@ void setdate(char* date_buffer, int date_buffer_size);
 
 void getdate();
 
+void optional_cmd_handler(char * cmd_buffer);
+
 void cmd_handler();
 
 /**

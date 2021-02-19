@@ -226,6 +226,102 @@ void getdate()
   sys_req(WRITE, DEFAULT_DEVICE, date, &buffer);
 }
 
+void optional_cmd_handler(char * cmd_buffer)
+{
+        char * cmd = strtok(cmd_buffer, " ");
+        char * pcb_name = strtok(NULL, " ");
+
+        if (strcmp(cmd, "createpcb") == 0)
+        {
+          char * pcb_priority_s = strtok(NULL, " ");
+          sys_req(WRITE, DEFAULT_DEVICE, "\ncreatepcb command recognized\nPCB Name: ", &buffer_size);
+          sys_req(WRITE, DEFAULT_DEVICE, pcb_name, &buffer_size);
+          sys_req(WRITE, DEFAULT_DEVICE, "\nPriority: ", &buffer_size);
+          sys_req(WRITE, DEFAULT_DEVICE, pcb_priority_s, &buffer_size);
+
+          //Uncomment these variables to be able to pass class to the AllocatePCB() function:
+          //int pcb_priority = atoi(pcb_priority_s);
+          char * class_s = strtok(NULL, " ");
+          //int class = atoi(class_s);
+
+          sys_req(WRITE, DEFAULT_DEVICE, "\nClass: ", &buffer_size);
+          sys_req(WRITE, DEFAULT_DEVICE, class_s, &buffer_size);
+          
+          //call function here:
+        }
+        else if (strcmp(cmd, "deletepcb") == 0)
+        {
+          sys_req(WRITE, DEFAULT_DEVICE, "\ndeletepcb command recognized\nPCB Name: ", &buffer_size);
+          sys_req(WRITE, DEFAULT_DEVICE, pcb_name, &buffer_size);
+
+          //call freePCB() here
+        }
+        else if (strcmp(cmd, "blockpcb") == 0)
+        {
+          sys_req(WRITE, DEFAULT_DEVICE, "\nblockpcb command recognized\nPCB Name: ", &buffer_size);
+          sys_req(WRITE, DEFAULT_DEVICE, pcb_name, &buffer_size);
+
+          //call function here
+        }
+        else if (strcmp(cmd, "ublockpcb") == 0)
+        {
+          sys_req(WRITE, DEFAULT_DEVICE, "\nunblock command recognized\nPCB Name: ", &buffer_size);
+          sys_req(WRITE, DEFAULT_DEVICE, pcb_name, &buffer_size);
+
+          //call UnblockPCB function here
+        }
+        else if (strcmp(cmd, "suspend") == 0)
+        {
+          sys_req(WRITE, DEFAULT_DEVICE, "\nsuspend command recognized\nPCB Name: ", &buffer_size);
+          sys_req(WRITE, DEFAULT_DEVICE, pcb_name, &buffer_size);
+
+          //call SuspendPCB() function here
+        }
+        else if (strcmp(cmd, "resume") == 0)
+        {
+          sys_req(WRITE, DEFAULT_DEVICE, "\nresume command recognized\nPCB Name: ", &buffer_size);
+          sys_req(WRITE, DEFAULT_DEVICE, pcb_name, &buffer_size);
+
+          //call resume function here
+        }
+        else if (strcmp(cmd, "setpriority") == 0)
+        {
+          char * pcb_priority_s = strtok(NULL, " ");
+          sys_req(WRITE, DEFAULT_DEVICE, "\nset priority command recognized\nPCB Name: ", &buffer_size);
+          sys_req(WRITE, DEFAULT_DEVICE, pcb_name, &buffer_size);
+          sys_req(WRITE, DEFAULT_DEVICE, "\nPriority: ", &buffer_size);
+          sys_req(WRITE, DEFAULT_DEVICE, pcb_priority_s, &buffer_size);
+
+          //int pcb_priority = atoi(pcb_priority_s);
+          
+          //call set priority fucntion here:
+        }
+        else if (strcmp(cmd, "showpcb") == 0)
+        {
+          sys_req(WRITE, DEFAULT_DEVICE, "\nshow pcb command recognized\nPCB Name: ", &buffer_size);
+          sys_req(WRITE, DEFAULT_DEVICE, pcb_name, &buffer_size);
+
+          //call function here
+        }
+        else if (strcmp(cmd, "resume") == 0)
+        {
+          sys_req(WRITE, DEFAULT_DEVICE, "\nresume command recognized\nPCB Name: ", &buffer_size);
+          sys_req(WRITE, DEFAULT_DEVICE, pcb_name, &buffer_size);
+
+          //call function here
+        }
+
+        //Command not recognized
+        else
+        {
+          char * cmd_err_msg = "\nInvalid input: ";
+
+          sys_req(WRITE, DEFAULT_DEVICE, cmd_err_msg, &buffer_size);
+          sys_req(WRITE, DEFAULT_DEVICE, cmd_buffer, &buffer_size);
+          sys_req(WRITE, DEFAULT_DEVICE, "\nMPX only recognizes certain commands.\nEnter help for list of commands or shutdown to exit MPX\n", &buffer_size);
+        }
+}
+
 /**
 
   @brief This function has a loop to continuously handle specific
@@ -323,7 +419,6 @@ void cmd_handler()
     {
       gettime();
     }
-
     else if (strcmp(cmd_buffer, "setdate\r") == 0)
     {
       sys_req(WRITE, DEFAULT_DEVICE, "\nPlease enter time in MM/DD/YYYY format\n", &buffer_size);
@@ -334,20 +429,26 @@ void cmd_handler()
 
       setdate(date_buffer, date_buffer_size);
     }
-
     else if (strcmp(cmd_buffer, "getdate\r") == 0)
     {
       getdate();
     }
-
-    //Command not recognized
-    else
+    else if (strcmp(cmd_buffer, "listpcb\r") == 0) // show all pcb
     {
-      char * cmd_err_msg = "\nInvalid input: ";
-
-      sys_req(WRITE, DEFAULT_DEVICE, cmd_err_msg, &buffer_size);
-      sys_req(WRITE, DEFAULT_DEVICE, cmd_buffer, &buffer_size);
-      sys_req(WRITE, DEFAULT_DEVICE, "\nMPX only recognizes certain commands.\nEnter help for list of commands or shutdown to exit MPX\n", &buffer_size);
+      sys_req(WRITE, DEFAULT_DEVICE, "listpcb command recognized", &buffer_size);
+    }
+    else if (strcmp(cmd_buffer, "list readypcb\r") == 0) // show all ready pcbs
+    {
+      sys_req(WRITE, DEFAULT_DEVICE, "list ready pcb recognized", &buffer_size);
+    }
+    else if (strcmp(cmd_buffer, "list blkpcb\r") == 0) // show all blocked pcbs
+    {
+      sys_req(WRITE, DEFAULT_DEVICE, "list blk pcb command recognized", &buffer_size);
+    }
+    //check for commands with optional arguments
+    else 
+    {
+      optional_cmd_handler(cmd_buffer);
     }
   }
 }
