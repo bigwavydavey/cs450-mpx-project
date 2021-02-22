@@ -18,5 +18,4 @@ struct pcb
 	unsigned char *base;
 	struct pcb *next;
 	struct pcb *prev;
-	int size;
 };

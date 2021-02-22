@@ -11,8 +11,7 @@ struct queue blocked_not_suspended;
 struct pcb * AllocatePCB(){
 	int stack_size = 1024;
 	struct pcb PCB;
-	PCB.size = strlen(PCB.name) + stack_size;
-	sys_alloc_mem(PCB.size);
+	sys_alloc_mem(sizeof(PCB));
 	PCB.base = PCB.stack;
 	PCB.top = PCB.base + stack_size;
 	int loop_control = (int)PCB.base;
