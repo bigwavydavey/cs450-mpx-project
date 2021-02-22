@@ -30,6 +30,50 @@ struct pcb * FindPCB(char *processName){
 		search queues for PCB with processName
 		return that PCB pointer
 	*/
+	// checks ready_suspended
+	struct pcb *current= ready_suspended.head;
+	while (current != NULL)
+	{
+		if (strcmp(current->name, processName) == 0)
+		{
+			return current;
+		}
+		current = current->next;
+	}
+
+	// checks ready_not_suspended
+	current= ready_not_suspended.head;
+	while (current != NULL)
+	{
+		if (strcmp(current->name, processName) == 0)
+		{
+			return current;
+		}
+		current = current->next;
+	}
+
+	//checks blocked_suspended;
+	current= blocked_suspended.head;
+	while (current != NULL)
+	{
+		if (strcmp(current->name, processName) == 0)
+		{
+			return current;
+		}
+		current = current->next;
+	}
+
+	//checks blocked_not_suspended
+	current= blocked_not_suspended.head;
+	while (current != NULL)
+	{
+		if (strcmp(current->name, processName) == 0)
+		{
+			return current;
+		}
+		current = current->next;
+	}
+	
 	return NULL;
 }
 
@@ -50,37 +94,109 @@ void FreePCB(struct pcb *PCB){
 
 void InsertPCB(struct pcb *PCB){
 /*
-	if ready
-		search queue for priority, then insert at end of priority
-	else
+	if tail has higher priority than PCB
 		put on tail of queue
+	else
+		search queue for priority, then insert at end of priority
 */
 	if (PCB->state == 0){
 		//ready_not_suspended queue
+		if (ready_not_suspended.tail->priority >= PCB->priority)
+		{
+			ready_not_suspended.tail->next= PCB;
+			PCB->prev = ready_not_suspended.tail;
+			ready_not_suspended.tail = PCB;
+		}
+		else
+		{
+			struct pcb *current= ready_not_suspended.head;
+			while(current->priority >= PCB->priority)
+			{
+				current = current->next;
+			}
+			current->next->prev = PCB;
+			PCB->next = current->next;
+			PCB->prev = current;
+			current->next = PCB;
+		}
+		
 	}
 	else if (PCB->state == 1){
 		//ready_suspended
+		if (ready_suspended.tail->priority >= PCB->priority)
+		{
+			ready_suspended.tail->next= PCB;
+			PCB->prev = ready_suspended.tail;
+			ready_suspended.tail = PCB;
+		}
+		else
+		{
+			struct pcb *current= ready_suspended.head;
+			while(current->priority >= PCB->priority)
+			{
+				current = current->next;
+			}
+			current->next->prev = PCB;
+			PCB->next = current->next;
+			PCB->prev = current;
+			current->next = PCB;
+		}
 	}
 	else if (PCB->state == 2){
 		//blocked_non_suspended
-		blocked_not_suspended.tail->next = PCB;
-		PCB->prev = blocked_not_suspended.tail;
-		blocked_not_suspended.tail = PCB;
+		if (blocked_not_suspended.tail->priority >= PCB->priority)
+		{
+			blocked_not_suspended.tail->next= PCB;
+			PCB->prev = blocked_not_suspended.tail;
+			blocked_not_suspended.tail = PCB;
+		}
+		else
+		{
+			struct pcb *current= blocked_not_suspended.head;
+			while(current->priority >= PCB->priority)
+			{
+				current = current->next;
+			}
+			current->next->prev = PCB;
+			PCB->next = current->next;
+			PCB->prev = current;
+			current->next = PCB;
+		}
 
 	}
 	else{
 		//blocked_suspended
-		blocked_suspended.tail->next = PCB;
-		PCB->prev = blocked_suspended.tail;
-		blocked_suspended.tail = PCB;
+		if (blocked_suspended.tail->priority >= PCB->priority)
+		{
+			blocked_suspended.tail->next= PCB;
+			PCB->prev = blocked_suspended.tail;
+			blocked_suspended.tail = PCB;
+		}
+		else
+		{
+			struct pcb *current= blocked_suspended.head;
+			while(current->priority >= PCB->priority)
+			{
+				current = current->next;
+			}
+			current->next->prev = PCB;
+			PCB->next = current->next;
+			PCB->prev = current;
+			current->next = PCB;
+		}
 	}
 
 }
 
 void RemovePCB(struct pcb *PCB){
-	FindPCB(PCB->name);
 	//remove from queue
 	//return success or error code
+
+	struct pcb *toRemove = FindPCB(PCB->name);
+
+	toRemove->prev->next = toRemove->next;
+	toRemove->next->prev = toRemove->prev;
+
 }
 
 struct pcb * SetupPCB(char * processName, int class, int priority){
