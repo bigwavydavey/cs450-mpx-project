@@ -3,7 +3,7 @@
 #include <core/io.h>
 #include "mpx_supt.h"
 #include "cmd_handler.h"
-#include "internal_procedures.h"
+#include "pcb_temp_commands.h"
 
 int buffer_size = 99;
 /**
@@ -227,6 +227,7 @@ void getdate()
   sys_req(WRITE, DEFAULT_DEVICE, "The date is: ", &buffer);
   sys_req(WRITE, DEFAULT_DEVICE, date, &buffer);
 }
+
 void optional_cmd_handler(char * cmd_buffer)
 {
   sys_req(WRITE, DEFAULT_DEVICE, cmd_buffer, &buffer_size);
@@ -240,7 +241,7 @@ void optional_cmd_handler(char * cmd_buffer)
     int pcb_priority = atoi(pcb_priority_s);
     int class = atoi(class_s);
 
-    SetupPCB(pcb_name, class, pcb_priority);
+    CreatePCB(pcb_name, class, pcb_priority);
 
     sys_req(WRITE, DEFAULT_DEVICE, "\nNew PCB successfully created.\n", &buffer_size);
   }

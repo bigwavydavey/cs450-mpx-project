@@ -1,35 +1,18 @@
-#include "SetupPCB.h"
-#include "InsertPCB.h"
-#include "RemovePCB.h"
-#include "FreePCB.h"
-#include "AllocatePCB.h"
-#include "FindPCB.h"
+#include "internal_procedures.h"
 
 void CreatePCB(char *processName, int class, int priority){
-	/*
-		check if name is unique(use FindPCB(processName)) and valid
-		check class
-		check priority must be 0-9
-		Create PCB pcb
-		SetupPCB(processName, class, priority);
-		InsertPCB(*pcb);
-	*/
+
+	SetupPCB(processName, class, priority);
 }
 
 void DeletePCB(char *processName){
-	/*
-		check if name is valid
-		RemovePCB()
-		FreePCB()
-	*/
+	
+	RemovePCB(FindPCB(processName));
 }
 
 void BlockPCB(char *processName){
-	/*
-		check if name is valid
-		FindPCB(processName)
-		Remove from ready and insert into blocked
-	*/
+	
+	RemovePCB(FindPCB(processName));
 }
 void UnblockPCB(char *processName){
 	/*
@@ -37,4 +20,5 @@ void UnblockPCB(char *processName){
 		FindPCB(processName)
 		Remove from blocked and insert into ready
 	*/
+	RemovePCB(FindPCB(processName));
 }

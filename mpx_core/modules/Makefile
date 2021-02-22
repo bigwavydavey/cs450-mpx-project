@@ -13,7 +13,8 @@ ASFLAGS = -f elf -g
 OBJFILES =\
 mpx_supt.o\
 cmd_handler.o\
-internal_procedures.o
+internal_procedures.o\
+pcb_temp_commands.o\
 
 .c.s:
 	$(CC) $(CFLAGS) -S -o $@ $<
