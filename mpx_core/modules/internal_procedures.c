@@ -7,6 +7,7 @@ struct queue ready_not_suspended;
 struct queue blocked_suspended;
 struct queue blocked_not_suspended;
 
+
 struct pcb * AllocatePCB(){
 	int stack_size = 1024;
 	struct pcb PCB;
@@ -84,11 +85,12 @@ void FreePCB(struct pcb *PCB){
 	char * failure = "ERROR: The PCB could not be freed from memory\0";
 	int failure_size = strlen(failure);
 	int *failure_len = &failure_size;
+
 	if (sys_free_mem(PCB) == -1){
-		sys_req(WRITE, DEFAULT_DEVICE, failure, success_len);
+		sys_req(WRITE, DEFAULT_DEVICE, failure, failure_len);
 	}
 	else{
-		sys_req(WRITE, DEFAULT_DEVICE, success, failure_len);
+		sys_req(WRITE, DEFAULT_DEVICE, success, success_len);
 	}
 }
 
@@ -191,12 +193,22 @@ void InsertPCB(struct pcb *PCB){
 void RemovePCB(struct pcb *PCB){
 	//remove from queue
 	//return success or error code
+	char * success = "Success!\0";
+	int success_size = strlen(success);
+	int *success_len = &success_size;
+	char * failure = "ERROR: The PCB could not be removed\0";
+	int failure_size = strlen(failure);
+	int *failure_len = &failure_size;
 
 	struct pcb *toRemove = FindPCB(PCB->name);
+	if (toRemove == NULL){
+		sys_req(WRITE, DEFAULT_DEVICE, failure, failure_len);
+	}
 
 	toRemove->prev->next = toRemove->next;
 	toRemove->next->prev = toRemove->prev;
 
+	sys_req(WRITE, DEFAULT_DEVICE, success, success_len);
 }
 
 struct pcb * SetupPCB(char * processName, int class, int priority){
