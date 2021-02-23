@@ -1,9 +1,5 @@
-#include "SetupPCB.h"
-#include "InsertPCB.h"
-#include "RemovePCB.h"
-#include "FreePCB.h"
-#include "AllocatePCB.h"
-#include "FindPCB.h"
+#include "internal_procedures.h"
+#include "mpx_supt.h"
 
 void SuspendPCB(char *processName){
 	/*

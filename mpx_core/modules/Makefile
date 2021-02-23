@@ -15,7 +15,7 @@ mpx_supt.o\
 cmd_handler.o\
 internal_procedures.o\
 pcb_temp_commands.o\
-
+pcb_user_commands.o
 .c.s:
 	$(CC) $(CFLAGS) -S -o $@ $<
 .s.o:
