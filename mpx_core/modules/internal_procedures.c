@@ -1,4 +1,5 @@
 #include "mpx_supt.h"
+#include <core/serial.h>
 #include "queue.c"
 #include <string.h>
 
@@ -10,19 +11,21 @@ struct queue blocked_not_suspended;
 
 struct pcb * AllocatePCB(){
 	int stack_size = 1024;
-	struct pcb PCB;
-	sys_alloc_mem(sizeof(PCB));
-	PCB.base = PCB.stack;
-	PCB.top = PCB.base + stack_size;
-	int loop_control = (int)PCB.base;
-	int loop_end = (int) PCB.top;
-	while (loop_control <= loop_end){
-		PCB.stack[loop_control] = '\0';
+	//struct pcb pcb;
+	struct pcb *PCB;
+	PCB = sys_alloc_mem(sizeof(PCB));
+	PCB->base = PCB->stack;
+	PCB->top = PCB->base + stack_size;
+	int loop_control = 0;
+	//int loop_end = (int) PCB->top;
+	while (loop_control < stack_size){
+		PCB->stack[loop_control] = '\0';
 		loop_control++;
 	}
-	struct pcb *pcb_point = &PCB;
-	return pcb_point;
-	return NULL;
+	serial_println("HELP");	
+	//struct pcb *pcb_point = &PCB;
+	return PCB;
+	//return NULL;
 }
 
 struct pcb * FindPCB(char *processName){
@@ -211,8 +214,7 @@ void RemovePCB(struct pcb *PCB){
 }
 
 struct pcb * SetupPCB(char * processName, int class, int priority){
-	struct pcb PCB;
-	struct pcb *pcb_point = &PCB;
+	struct pcb *pcb_point;
 	pcb_point = AllocatePCB();
 	strcpy(pcb_point->name, processName);
 	pcb_point->class = class;
