@@ -11,7 +11,6 @@ struct queue blocked_not_suspended;
 
 struct pcb * AllocatePCB(){
 	int stack_size = 1024;
-	//struct pcb pcb;
 	struct pcb *PCB;
 	PCB = sys_alloc_mem(sizeof(PCB));
 	PCB->base = PCB->stack;
@@ -22,10 +21,8 @@ struct pcb * AllocatePCB(){
 		PCB->stack[loop_control] = '\0';
 		loop_control++;
 	}
-	serial_println("HELP");	
-	//struct pcb *pcb_point = &PCB;
 	return PCB;
-	//return NULL;
+	return NULL;
 }
 
 struct pcb * FindPCB(char *processName){
