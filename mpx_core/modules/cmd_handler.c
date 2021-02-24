@@ -4,6 +4,7 @@
 #include "mpx_supt.h"
 #include "cmd_handler.h"
 #include "pcb_temp_commands.h"
+#include "pcb_user_commands.h"
 
 int buffer_size = 99;
 /**
@@ -230,7 +231,6 @@ void getdate()
 
 void optional_cmd_handler(char * cmd_buffer)
 {
-  sys_req(WRITE, DEFAULT_DEVICE, cmd_buffer, &buffer_size);
   char * cmd = strtok(cmd_buffer, " ");
   char * pcb_name = strtok(NULL, " ");
 
@@ -247,66 +247,35 @@ void optional_cmd_handler(char * cmd_buffer)
   }
   else if (strcmp(cmd, "deletepcb") == 0)
   {
-    sys_req(WRITE, DEFAULT_DEVICE, "\ndeletepcb command recognized\nPCB Name: ", &buffer_size);
-    sys_req(WRITE, DEFAULT_DEVICE, pcb_name, &buffer_size);
-
-    //call freePCB() here
+    DeletePCB(pcb_name);
   }
   else if (strcmp(cmd, "blockpcb") == 0)
   {
-    sys_req(WRITE, DEFAULT_DEVICE, "\nblockpcb command recognized\nPCB Name: ", &buffer_size);
-    sys_req(WRITE, DEFAULT_DEVICE, pcb_name, &buffer_size);
-
-    //call function here
+    BlockPCB(pcb_name);
   }
   else if (strcmp(cmd, "unblockpcb") == 0)
   {
-    sys_req(WRITE, DEFAULT_DEVICE, "\nunblock command recognized\nPCB Name: ", &buffer_size);
-    sys_req(WRITE, DEFAULT_DEVICE, pcb_name, &buffer_size);
-
-    //call UnblockPCB function here
+    UnblockPCB(pcb_name);
   }
-  else if (strcmp(cmd, "suspend") == 0)
+  else if (strcmp(cmd, "suspendpcb") == 0)
   {
-    
-    sys_req(WRITE, DEFAULT_DEVICE, "\nsuspend command recognized\nPCB Name: ", &buffer_size);
-
-    //call SuspendPCB() function here
+    SuspendPCB(pcb_name);
   }
-  else if (strcmp(cmd, "resume") == 0)
+  else if (strcmp(cmd, "resumepcb") == 0)
   {
-    sys_req(WRITE, DEFAULT_DEVICE, "\nresume command recognized\nPCB Name: ", &buffer_size);
-    sys_req(WRITE, DEFAULT_DEVICE, pcb_name, &buffer_size);
-
-    //call resume function here
+    ResumePCB(pcb_name);
   }
   else if (strcmp(cmd, "setpriority") == 0)
   {
     char * pcb_priority_s = strtok(NULL, " ");
-    sys_req(WRITE, DEFAULT_DEVICE, "\nset priority command recognized\nPCB Name: ", &buffer_size);
-    sys_req(WRITE, DEFAULT_DEVICE, pcb_name, &buffer_size);
-    sys_req(WRITE, DEFAULT_DEVICE, "\nPriority: ", &buffer_size);
-    sys_req(WRITE, DEFAULT_DEVICE, pcb_priority_s, &buffer_size);
-
-    //int pcb_priority = atoi(pcb_priority_s);
+    int pcb_priority = atoi(pcb_priority_s);
     
-    //call set priority fucntion here:
+    SetPCBPriority(pcb_name, pcb_priority);
   }
   else if (strcmp(cmd, "showpcb") == 0)
   {
-    sys_req(WRITE, DEFAULT_DEVICE, "\nshow pcb command recognized\nPCB Name: ", &buffer_size);
-    sys_req(WRITE, DEFAULT_DEVICE, pcb_name, &buffer_size);
-
-    //call function here
-  }
-  else if (strcmp(cmd, "resume") == 0)
-  {
-    sys_req(WRITE, DEFAULT_DEVICE, "\nresume command recognized\nPCB Name: ", &buffer_size);
-    sys_req(WRITE, DEFAULT_DEVICE, pcb_name, &buffer_size);
-
-    //call function here
-  }
-
+    ShowPCB(pcb_name);
+  }  
   //Command not recognized
   else
   {
@@ -431,7 +400,18 @@ void cmd_handler()
     {
       getdate();
     }
-
+    else if (strcmp(cmd_buffer, "showpcbs\r") == 0)
+    {
+      ShowAll(); 
+    }
+    else if (strcmp(cmd_buffer, "showblkpcb\r") == 0)
+    {
+      ShowBlocked();  
+    }
+  else if (strcmp(cmd_buffer, "showreadypcb\r") == 0)
+    {
+      ShowReady();  
+    }
     //Command not recognized
     else
     {

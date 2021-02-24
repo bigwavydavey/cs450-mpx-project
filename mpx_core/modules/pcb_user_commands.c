@@ -2,6 +2,7 @@
 #include "internal_procedures.h"
 #include "mpx_supt.h"
 #include "structs.h"
+int buffer_length = 99;
 
 void SuspendPCB(char *processName){
 	/*
@@ -57,17 +58,52 @@ void SetPCBPriority(char *processName, int priority){
   pcb->priority = priority;
 }
 
-void ShowPCB(char *processName){
+void ShowPCB(char *processName)
+{
 	/*
 		check name
 		FindPCB(processName);
 		buffer = "Process Name: processName | State: state | Suspended Status: status | Priority: priority\n";
 		sys_req(WRITE, DEFAULT_DEVICE, buffer, buffer.len());
 	*/
-  FindPCB(processName);
-  char *buffer = "Process Name: processName | State: state | Suspended Status: status | Priority: priority\n";
-  int buffer_length = strlen(buffer);
-  sys_req(WRITE, DEFAULT_DEVICE, buffer, &buffer_length);
+  struct pcb display_pcb = *(FindPCB(processName));
+
+  if (display_pcb.name == NULL)
+  {
+    sys_req(WRITE, DEFAULT_DEVICE, "\nERROR:The pcb you entered does not exist", &buffer_length);
+  }
+  else
+  {
+    char * class_s = "";
+    itoa(display_pcb.class, class_s, 10);
+    char * priority_s = "";
+    itoa(display_pcb.priority, priority_s, 10);
+    char * state_s = "";
+    itoa(display_pcb.state, state_s, 10);
+
+    sys_req(WRITE, DEFAULT_DEVICE, "\nProcess Name: ", &buffer_length);
+    sys_req(WRITE, DEFAULT_DEVICE, display_pcb.name, &buffer_length);
+    sys_req(WRITE, DEFAULT_DEVICE, "\nClass: ", &buffer_length);
+    sys_req(WRITE, DEFAULT_DEVICE, class_s, &buffer_length);
+    sys_req(WRITE, DEFAULT_DEVICE, "\nPriority: ", &buffer_length);
+    sys_req(WRITE, DEFAULT_DEVICE, priority_s, &buffer_length);
+    sys_req(WRITE, DEFAULT_DEVICE, "\nState: ", &buffer_length);
+    sys_req(WRITE, DEFAULT_DEVICE, state_s, &buffer_length);
+
+    sys_req(WRITE, DEFAULT_DEVICE, "\nSuspended status: ", &buffer_length);
+    if (display_pcb.state == 0)
+      sys_req(WRITE, DEFAULT_DEVICE, "ready, not suspended", &buffer_length);
+    else if (display_pcb.state == 1)
+      sys_req(WRITE, DEFAULT_DEVICE, "ready, suspended", &buffer_length);
+    else if (display_pcb.state == 2)
+      sys_req(WRITE, DEFAULT_DEVICE, "blocked, not suspended", &buffer_length);
+    else if (display_pcb.state == 3)
+      sys_req(WRITE, DEFAULT_DEVICE, "blocked, suspended", &buffer_length);
+    else if (display_pcb.state == 5)
+      sys_req(WRITE, DEFAULT_DEVICE, "running", &buffer_length);
+    else
+      sys_req(WRITE, DEFAULT_DEVICE, "UNKNOWN", &buffer_length);
+  }
 }
 
 void ShowReady(){
@@ -77,16 +113,15 @@ void ShowReady(){
 		while pcb.next != NULL
 		ShowPCB(pcb.processName);
 	*/
-  struct pcb *pcb = ready_suspended->head;
-  int length = 10;
-  sys_req(WRITE, DEFAULT_DEVICE, "Ready:\n", &length);
+  struct pcb *pcb = ready_suspended.head;
+  sys_req(WRITE, DEFAULT_DEVICE, "Ready:\n", &buffer_length);
 
   while( pcb->next != NULL )
   {
     ShowPCB(pcb->name);
   }
 
-  struct pcb *pcb = ready_not_suspended->head;
+  *pcb = *(ready_not_suspended.head);
   while( pcb->next != NULL )
   {
     ShowPCB(pcb->name);
@@ -100,16 +135,15 @@ void ShowBlocked(){
 		while pcb.next != NUll
 		ShowPCB(pcb.processName);
 	*/
-  struct pcb *pcb = blocked_suspended->head;
-  int length = 10;
-  sys_req(WRITE, DEFAULT_DEVICE, "Blocked:\n", &length);
+  struct pcb *pcb = blocked_suspended.head;
+  sys_req(WRITE, DEFAULT_DEVICE, "Blocked:\n", &buffer_length);
 
   while( pcb->next != NULL )
   {
     ShowPCB(pcb->name);
   }
 
-  struct pcb *pcb = blocked_not_suspended->head;
+  *pcb = *(blocked_not_suspended.head);
   while( pcb->next != NULL )
   {
     ShowPCB(pcb->name);
@@ -117,10 +151,6 @@ void ShowBlocked(){
 }
 
 void ShowAll(){
-	/*
-		ShowReady();
-		ShowBlocked();
-	*/
   ShowReady();
   ShowBlocked();
 }

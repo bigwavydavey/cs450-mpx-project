@@ -7,6 +7,6 @@ void SetPCBPriority(char *processName, int priority);
 void ShowPCB(char *processName);
 void ShowReady();
 void ShowBlocked();
-void ShowALl();
+void ShowAll();
 
 #endif
