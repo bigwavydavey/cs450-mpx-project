@@ -1,5 +1,7 @@
+#include <string.h>
 #include "internal_procedures.h"
 #include "mpx_supt.h"
+#include "structs.h"
 
 void SuspendPCB(char *processName){
 	/*
@@ -8,17 +10,17 @@ void SuspendPCB(char *processName){
 		if 4 queues, remove from non-suspeneded and
 		insert into suspended
 	*/
-  struct PCB *pcb = FindPCB(processName);
-  if( pcb.state == 0 )
+  struct pcb *pcb = FindPCB(processName);
+  if( pcb->state == 0 )
   {
     RemovePCB(pcb);
-    pcb.state = 1;
+    pcb->state = 1;
     InsertPCB(pcb);
   }
-  else if( pcb.state == 2 )
+  else if( pcb->state == 2 )
   {
     RemovePCB(pcb);
-    pcb.state = 3;
+    pcb->state = 3;
     InsertPCB(pcb);
   }
 }
@@ -30,17 +32,17 @@ void ResumePCB(char *processName){
 		if 4 queues, remove from suspeneded and
 		insert into non-suspended
 	*/
-  struct PCB *pcb = FindPCB(processName);
-  if( pcb.state == 1 )
+  struct pcb *pcb = FindPCB(processName);
+  if( pcb->state == 1 )
   {
     RemovePCB(pcb);
-    pcb.state = 0;
+    pcb->state = 0;
     InsertPCB(pcb);
   }
-  else if( pcb.state == 3 )
+  else if( pcb->state == 3 )
   {
     RemovePCB(pcb);
-    pcb.state = 2;
+    pcb->state = 2;
     InsertPCB(pcb);
   }
 }
@@ -51,8 +53,8 @@ void SetPCBPriority(char *processName, int priority){
 		struct PCB *pcb = FindPCB(*processName);
 		pcb.priority = priority;
 	*/
-  struct PCB *pcb = FindPCB(*processName);
-  pcb.priority = priority;
+  struct pcb *pcb = FindPCB(processName);
+  pcb->priority = priority;
 }
 
 void ShowPCB(char *processName){
@@ -63,8 +65,9 @@ void ShowPCB(char *processName){
 		sys_req(WRITE, DEFAULT_DEVICE, buffer, buffer.len());
 	*/
   FindPCB(processName);
-  buffer = "Process Name: processName | State: state | Suspended Status: status | Priority: priority\n";
-  sys_req(WRITE, DEFAULT_DEVICE, buffer, buffer.len());
+  char *buffer = "Process Name: processName | State: state | Suspended Status: status | Priority: priority\n";
+  int buffer_length = strlen(buffer);
+  sys_req(WRITE, DEFAULT_DEVICE, buffer, &buffer_length);
 }
 
 void ShowReady(){
@@ -74,12 +77,14 @@ void ShowReady(){
 		while pcb.next != NULL
 		ShowPCB(pcb.processName);
 	*/
-  struct PCB pcb = ReadyQueueHead;
-  sys_req(WRITE, DEFAULT_DEVICE, "Ready:\n", count);
+  struct pcb *pcb = ready_suspended->head;
+  int length = 10;
+  sys_req(WRITE, DEFAULT_DEVICE, "Ready:\n", &length);
 
-  while( pcb.next != NULL )
+  while( pcb->next != NULL )
   {
-    ShowPCB(pcb.processName);
+    ShowPCB(pcb->name);
+  }
 }
 
 void ShowBlocked(){
@@ -89,12 +94,13 @@ void ShowBlocked(){
 		while pcb.next != NUll
 		ShowPCB(pcb.processName);
 	*/
-  struct PCB pcb = BlockedQueueHead;
-  sys_req(WRITE, DEFAULT_DEVICE, "Blocked:\n", count);
+  struct pcb *pcb = blocked_suspended->head;
+  int length = 10;
+  sys_req(WRITE, DEFAULT_DEVICE, "Blocked:\n", &length);
 
-  while( pcb.next != NULL )
+  while( pcb->next != NULL )
   {
-    ShowPCB(pcb.processName);
+    ShowPCB(pcb->name);
   }
 }
 
