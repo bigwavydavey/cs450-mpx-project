@@ -1,3 +1,5 @@
+#ifndef _STRUCTS_H
+#define _STRUCTS_H
 
 struct queue
 {
@@ -19,3 +21,5 @@ struct pcb
 	struct pcb *next;
 	struct pcb *prev;
 };
+
+#endif

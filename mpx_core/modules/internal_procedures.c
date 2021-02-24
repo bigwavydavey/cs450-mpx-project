@@ -1,6 +1,6 @@
 #include "mpx_supt.h"
 #include <core/serial.h>
-#include "queue.c"
+#include "structs.h"
 #include <string.h>
 
 struct queue ready_suspended;
@@ -73,7 +73,7 @@ struct pcb * FindPCB(char *processName){
 		}
 		current = current->next;
 	}
-	
+
 	return NULL;
 }
 
@@ -120,7 +120,7 @@ void InsertPCB(struct pcb *PCB){
 			PCB->prev = current;
 			current->next = PCB;
 		}
-		
+
 	}
 	else if (PCB->state == 1){
 		//ready_suspended
