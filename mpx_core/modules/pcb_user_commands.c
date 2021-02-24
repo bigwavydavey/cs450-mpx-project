@@ -85,6 +85,12 @@ void ShowReady(){
   {
     ShowPCB(pcb->name);
   }
+
+  struct pcb *pcb = ready_not_suspended->head;
+  while( pcb->next != NULL )
+  {
+    ShowPCB(pcb->name);
+  }
 }
 
 void ShowBlocked(){
@@ -98,6 +104,12 @@ void ShowBlocked(){
   int length = 10;
   sys_req(WRITE, DEFAULT_DEVICE, "Blocked:\n", &length);
 
+  while( pcb->next != NULL )
+  {
+    ShowPCB(pcb->name);
+  }
+
+  struct pcb *pcb = blocked_not_suspended->head;
   while( pcb->next != NULL )
   {
     ShowPCB(pcb->name);
