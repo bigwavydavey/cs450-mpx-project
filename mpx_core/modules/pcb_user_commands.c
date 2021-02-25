@@ -1,4 +1,5 @@
 #include <string.h>
+#include <core/serial.h>
 #include "internal_procedures.h"
 #include "mpx_supt.h"
 #include "structs.h"
@@ -172,20 +173,34 @@ void ShowReady(){
 		while pcb.next != NULL
 		ShowPCB(pcb.processName);
 	*/
-  struct pcb *pcb = ready_suspended.head;
   sys_req(WRITE, DEFAULT_DEVICE, "Ready:\n", &buffer_length);
-
+  struct pcb *pcb;
   if(ready_suspended.head == NULL && ready_not_suspended.head == NULL)
     sys_req(WRITE, DEFAULT_DEVICE, "There are no ready processes.", &buffer_length);
-  else
-  {
+  else if(ready_suspended.head == NULL){
+    pcb = ready_not_suspended.head;
     while( pcb->next != NULL )
     {
       ShowPCB(pcb->name);
       pcb = pcb->next;
     }
-
-    *pcb = *(ready_not_suspended.head);
+  }
+  else if (ready_not_suspended.head == NULL){
+    pcb = ready_suspended.head;
+    while( pcb->next != NULL )
+    {
+      ShowPCB(pcb->name);
+      pcb = pcb->next;
+    }
+  }
+  else{
+    pcb = ready_suspended.head;
+    while( pcb->next != NULL )
+    {
+      ShowPCB(pcb->name);
+      pcb = pcb->next;
+    }
+    pcb = ready_not_suspended.head;
     while( pcb->next != NULL )
     {
       ShowPCB(pcb->name);

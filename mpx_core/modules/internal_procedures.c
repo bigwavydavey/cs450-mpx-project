@@ -102,12 +102,15 @@ void InsertPCB(struct pcb *PCB){
 */
 	if (PCB->state == 0){
 		//ready_not_suspended queue
-		if (ready_not_suspended.tail->priority >= PCB->priority)
+		if (ready_not_suspended.count == 0){
+			ready_not_suspended.head = PCB;
+			ready_not_suspended.tail = PCB;
+		}
+		else if (ready_not_suspended.tail->priority >= PCB->priority)
 		{
 			ready_not_suspended.tail->next= PCB;
 			PCB->prev = ready_not_suspended.tail;
-			ready_not_suspended.tail = PCB;
-		}
+			ready_not_suspended.tail = PCB;		}
 		else
 		{
 			struct pcb *current= ready_not_suspended.head;
@@ -120,10 +123,15 @@ void InsertPCB(struct pcb *PCB){
 			PCB->prev = current;
 			current->next = PCB;
 		}
+		ready_not_suspended.count++;
 
 	}
 	else if (PCB->state == 1){
 		//ready_suspended
+		if (ready_suspended.count == 0){
+			ready_suspended.head = PCB;
+			ready_suspended.tail = PCB;
+		}
 		if (ready_suspended.tail->priority >= PCB->priority)
 		{
 			ready_suspended.tail->next= PCB;
@@ -142,49 +150,38 @@ void InsertPCB(struct pcb *PCB){
 			PCB->prev = current;
 			current->next = PCB;
 		}
+		ready_suspended.count++;
 	}
 	else if (PCB->state == 2){
-		//blocked_non_suspended
-		if (blocked_not_suspended.tail->priority >= PCB->priority)
-		{
-			blocked_not_suspended.tail->next= PCB;
-			PCB->prev = blocked_not_suspended.tail;
+		//blocked_not_suspended
+		if (blocked_not_suspended.count == 0){
+			blocked_not_suspended.head = PCB;
 			blocked_not_suspended.tail = PCB;
+
 		}
 		else
 		{
-			struct pcb *current= blocked_not_suspended.head;
-			while(current->priority >= PCB->priority)
-			{
-				current = current->next;
-			}
-			current->next->prev = PCB;
-			PCB->next = current->next;
-			PCB->prev = current;
-			current->next = PCB;
+			PCB->prev = blocked_not_suspended.tail;
+			blocked_not_suspended.tail->next = PCB;
+			blocked_not_suspended.tail = PCB;
 		}
+		blocked_not_suspended.count++;
 
 	}
 	else{
 		//blocked_suspended
-		if (blocked_suspended.tail->priority >= PCB->priority)
+		if (blocked_suspended.count == 0)
+		{
+			blocked_suspended.head = PCB;
+			blocked_suspended.tail = PCB;
+		}
+		else
 		{
 			blocked_suspended.tail->next= PCB;
 			PCB->prev = blocked_suspended.tail;
 			blocked_suspended.tail = PCB;
 		}
-		else
-		{
-			struct pcb *current= blocked_suspended.head;
-			while(current->priority >= PCB->priority)
-			{
-				current = current->next;
-			}
-			current->next->prev = PCB;
-			PCB->next = current->next;
-			PCB->prev = current;
-			current->next = PCB;
-		}
+		blocked_suspended.count++;
 	}
 
 }
@@ -214,6 +211,7 @@ struct pcb * SetupPCB(char * processName, int class, int priority){
 	struct pcb *pcb_point;
 	pcb_point = AllocatePCB();
 	strcpy(pcb_point->name, processName);
+	//serial_println(pcb_point->name);
 	pcb_point->class = class;
 	pcb_point->priority = priority;
 	pcb_point->state = 0;

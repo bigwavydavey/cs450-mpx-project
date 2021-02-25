@@ -18,8 +18,10 @@ void DeletePCB(char *processName){
 	int buffer_size = 60;
 	struct pcb *pcb = FindPCB(processName);
 
-	if( pcb != NULL )
+	if( pcb != NULL ){
 		RemovePCB(pcb);
+		FreePCB(pcb);
+	}
 	else
 		sys_req(WRITE, DEFAULT_DEVICE,"\nUnable to find pcb. Aborting deletepcb command...\n", &buffer_size);
 }

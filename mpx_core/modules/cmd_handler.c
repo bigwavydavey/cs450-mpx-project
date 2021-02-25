@@ -246,12 +246,12 @@ void optional_cmd_handler(char * cmd_buffer)
 
   if (strcmp(cmd, "createpcb") == 0)
   {
-    char * pcb_priority_s = strtok(NULL, " ");
+    //char * pcb_priority_s = strtok(NULL, " ");
     char * class_s = strtok(NULL, " ");
-    int pcb_priority = atoi(pcb_priority_s);
+    //int pcb_priority = atoi(pcb_priority_s);
     int class = atoi(class_s);
 
-    CreatePCB(pcb_name, class, pcb_priority);
+    CreatePCB(pcb_name, class, 1);
 
     sys_req(WRITE, DEFAULT_DEVICE, "\nNew PCB successfully created.\n", &buffer_size);
   }
