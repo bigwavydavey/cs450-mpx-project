@@ -2,6 +2,13 @@
 #include "structs.h"
 #include "mpx_supt.h"
 
+/**
+* @brief This function will create a new PCB by calling the internal function SetupPCB
+*
+* @param processName: full string representation of the desired process name
+* @param class: identification of the process as either a application or system process
+* @param priority: the priority level of the new process for the order it is added to the process queues
+*/
 void CreatePCB(char *processName, int class, int priority){
 
 	int buffer_size = 60;
@@ -13,6 +20,11 @@ void CreatePCB(char *processName, int class, int priority){
 		SetupPCB(processName, class, priority);
 }
 
+/**
+* @brief This function will delete a PCB from the queue by calling the internal function RemovePCB
+*
+* @param processName: full string representation of the desired process name
+*/
 void DeletePCB(char *processName){
 
 	int buffer_size = 60;
@@ -26,6 +38,11 @@ void DeletePCB(char *processName){
 		sys_req(WRITE, DEFAULT_DEVICE,"\nUnable to find pcb. Aborting deletepcb command...\n", &buffer_size);
 }
 
+/**
+* @brief This function will remove the PCB from a ready queue and add it to a blocked queue
+*
+* @param processName: full string representation of the desired process name
+*/
 void BlockPCB(char *processName){
 
 	int buffer_size = 60;
@@ -40,6 +57,12 @@ void BlockPCB(char *processName){
 	else
 		sys_req(WRITE, DEFAULT_DEVICE,"\nUnable to find pcb. Aborting blockpcb command...\n", &buffer_size);
 }
+
+/**
+* @brief his function will remove the PCB from a blocked queue and add it to a ready queue
+*
+* @param processName: full string representation of the desired process name
+*/
 void UnblockPCB(char *processName){
 	/*
 		check if name is valid
