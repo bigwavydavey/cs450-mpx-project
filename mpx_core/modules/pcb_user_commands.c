@@ -22,17 +22,22 @@ void SuspendPCB(char *processName){
 		insert into suspended
 	*/
   struct pcb *pcb = FindPCB(processName);
-  if( pcb->state == 0 )
+  if(pcb == NULL)
+    sys_req(WRITE, DEFAULT_DEVICE, "\nERROR:The pcb you entered does not exist\n", &buffer_length);
+  else
   {
-    RemovePCB(pcb);
-    pcb->state = 1;
-    InsertPCB(pcb);
-  }
-  else if( pcb->state == 2 )
-  {
-    RemovePCB(pcb);
-    pcb->state = 3;
-    InsertPCB(pcb);
+    if( pcb->state == 0 )
+    {
+      RemovePCB(pcb);
+      pcb->state = 1;
+      InsertPCB(pcb);
+    }
+    else if( pcb->state == 2 )
+    {
+      RemovePCB(pcb);
+      pcb->state = 3;
+      InsertPCB(pcb);
+    }
   }
 }
 
@@ -54,17 +59,23 @@ void ResumePCB(char *processName){
 		insert into non-suspended
 	*/
   struct pcb *pcb = FindPCB(processName);
-  if( pcb->state == 1 )
+
+  if(pcb == NULL)
+    sys_req(WRITE, DEFAULT_DEVICE, "\nERROR:The pcb you entered does not exist\n", &buffer_length);
+  else
   {
-    RemovePCB(pcb);
-    pcb->state = 0;
-    InsertPCB(pcb);
-  }
-  else if( pcb->state == 3 )
-  {
-    RemovePCB(pcb);
-    pcb->state = 2;
-    InsertPCB(pcb);
+    if( pcb->state == 1 )
+    {
+      RemovePCB(pcb);
+      pcb->state = 0;
+      InsertPCB(pcb);
+    }
+    else if( pcb->state == 3 )
+    {
+      RemovePCB(pcb);
+      pcb->state = 2;
+      InsertPCB(pcb);
+    }
   }
 }
 
@@ -84,7 +95,12 @@ void SetPCBPriority(char *processName, int priority){
 		pcb.priority = priority;
 	*/
   struct pcb *pcb = FindPCB(processName);
-  pcb->priority = priority;
+  if(pcb == NULL)
+    sys_req(WRITE, DEFAULT_DEVICE, "\nERROR:The pcb you entered does not exist\n", &buffer_length);
+  else
+  {
+    pcb->priority = priority;
+  }
 }
 /**
   @brief This function displays a user
@@ -102,23 +118,23 @@ void ShowPCB(char *processName)
 		buffer = "Process Name: processName | State: state | Suspended Status: status | Priority: priority\n";
 		sys_req(WRITE, DEFAULT_DEVICE, buffer, buffer.len());
 	*/
-  struct pcb display_pcb = *(FindPCB(processName));
+  struct pcb *display_pcb = FindPCB(processName);
 
-  if (display_pcb.name == NULL)
+  if (display_pcb->name == NULL)
   {
-    sys_req(WRITE, DEFAULT_DEVICE, "\nERROR:The pcb you entered does not exist", &buffer_length);
+    sys_req(WRITE, DEFAULT_DEVICE, "\nERROR:The pcb you entered does not exist\n", &buffer_length);
   }
   else
   {
     char * class_s = "";
-    itoa(display_pcb.class, class_s, 10);
+    itoa(display_pcb->class, class_s, 10);
     char * priority_s = "";
-    itoa(display_pcb.priority, priority_s, 10);
+    itoa(display_pcb->priority, priority_s, 10);
     char * state_s = "";
-    itoa(display_pcb.state, state_s, 10);
+    itoa(display_pcb->state, state_s, 10);
 
     sys_req(WRITE, DEFAULT_DEVICE, "\nProcess Name: ", &buffer_length);
-    sys_req(WRITE, DEFAULT_DEVICE, display_pcb.name, &buffer_length);
+    sys_req(WRITE, DEFAULT_DEVICE, display_pcb->name, &buffer_length);
     sys_req(WRITE, DEFAULT_DEVICE, "\nClass: ", &buffer_length);
     sys_req(WRITE, DEFAULT_DEVICE, class_s, &buffer_length);
     sys_req(WRITE, DEFAULT_DEVICE, "\nPriority: ", &buffer_length);
@@ -127,15 +143,15 @@ void ShowPCB(char *processName)
     sys_req(WRITE, DEFAULT_DEVICE, state_s, &buffer_length);
 
     sys_req(WRITE, DEFAULT_DEVICE, "\nSuspended status: ", &buffer_length);
-    if (display_pcb.state == 0)
+    if (display_pcb->state == 0)
       sys_req(WRITE, DEFAULT_DEVICE, "ready, not suspended", &buffer_length);
-    else if (display_pcb.state == 1)
+    else if (display_pcb->state == 1)
       sys_req(WRITE, DEFAULT_DEVICE, "ready, suspended", &buffer_length);
-    else if (display_pcb.state == 2)
+    else if (display_pcb->state == 2)
       sys_req(WRITE, DEFAULT_DEVICE, "blocked, not suspended", &buffer_length);
-    else if (display_pcb.state == 3)
+    else if (display_pcb->state == 3)
       sys_req(WRITE, DEFAULT_DEVICE, "blocked, suspended", &buffer_length);
-    else if (display_pcb.state == 5)
+    else if (display_pcb->state == 5)
       sys_req(WRITE, DEFAULT_DEVICE, "running", &buffer_length);
     else
       sys_req(WRITE, DEFAULT_DEVICE, "UNKNOWN", &buffer_length);
