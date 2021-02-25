@@ -160,7 +160,7 @@ void ShowReady(){
   sys_req(WRITE, DEFAULT_DEVICE, "Ready:\n", &buffer_length);
 
   if(ready_suspended.head == NULL && ready_not_suspended.head == NULL)
-    sys_req(WRITE, DEFAULT_DEVICE, "There are no ready processes.");
+    sys_req(WRITE, DEFAULT_DEVICE, "There are no ready processes.", &buffer_length);
   else
   {
     while( pcb->next != NULL )
@@ -173,7 +173,7 @@ void ShowReady(){
     while( pcb->next != NULL )
     {
       ShowPCB(pcb->name);
-      pcb = pcb->next
+      pcb = pcb->next;
     }
   }
 }
@@ -193,10 +193,10 @@ void ShowBlocked(){
 		ShowPCB(pcb.processName);
 	*/
   struct pcb *pcb = blocked_suspended.head;
-  sys_req(WRITE, DEFAULT_DEVICE, "Blocked:\n", &buffer_length);
+  sys_req(WRITE, DEFAULT_DEVICE, "\nBlocked:\n", &buffer_length);
 
   if(blocked_suspended.head == NULL && blocked_not_suspended.head == NULL)
-    sys_req(WRITE, DEFAULT_DEVICE, "There are no blocked processes.");
+    sys_req(WRITE, DEFAULT_DEVICE, "There are no blocked processes.", &buffer_length);
   else
   {
     while( pcb->next != NULL )
