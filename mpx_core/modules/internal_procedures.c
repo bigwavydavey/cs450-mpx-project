@@ -239,9 +239,78 @@ void RemovePCB(struct pcb *PCB){
 		sys_req(WRITE, DEFAULT_DEVICE, failure, failure_len);
 	}
 
-	toRemove->prev->next = toRemove->next;
-	toRemove->next->prev = toRemove->prev;
-
+	if (toRemove->state == 0){
+		if (ready_not_suspended.count == 1){
+			ready_not_suspended.head = NULL;
+			ready_not_suspended.tail = NULL;
+		}
+		else if (toRemove->prev == NULL){
+			ready_not_suspended.head = toRemove->next;
+			ready_not_suspended.head->prev = NULL;
+		}
+		else if (toRemove->next == NULL){
+			ready_not_suspended.tail = toRemove->prev;
+			ready_not_suspended.tail->next = NULL;
+		}
+		else{
+			toRemove->prev->next = toRemove->next;
+			toRemove->next->prev = toRemove->prev;
+		}
+	}
+	else if (toRemove->state == 1){
+		if (ready_suspended.count == 1){
+			ready_suspended.head = NULL;
+			ready_suspended.tail = NULL;
+		}
+		else if (toRemove->prev == NULL){
+			ready_suspended.head = toRemove->next;
+			ready_suspended.head->prev = NULL;
+		}
+		else if (toRemove->next == NULL){
+			ready_suspended.tail = toRemove->prev;
+			ready_suspended.tail->next = NULL;
+		}
+		else{
+			toRemove->prev->next = toRemove->next;
+			toRemove->next->prev = toRemove->prev;
+		}
+	}
+	else if (toRemove->state == 2){
+		if (blocked_not_suspended.count == 1){
+			blocked_not_suspended.head = NULL;
+			blocked_not_suspended.tail = NULL;
+		}
+		else if (toRemove->prev == NULL){
+			blocked_not_suspended.head = toRemove->next;
+			blocked_not_suspended.head->prev = NULL;
+		}
+		else if (toRemove->next == NULL){
+			blocked_not_suspended.tail = toRemove->prev;
+			blocked_not_suspended.tail->next = NULL;
+		}
+		else{
+			toRemove->prev->next = toRemove->next;
+			toRemove->next->prev = toRemove->prev;
+		}
+	}
+	else {
+		if (blocked_suspended.count == 1){
+			blocked_suspended.head = NULL;
+			blocked_suspended.tail = NULL;
+		}
+		else if (toRemove->prev == NULL){
+			blocked_suspended.head = toRemove->next;
+			blocked_suspended.head->prev = NULL;
+		}
+		else if (toRemove->next == NULL){
+			blocked_suspended.tail = toRemove->prev;
+			blocked_suspended.tail->next = NULL;
+		}
+		else{
+			toRemove->prev->next = toRemove->next;
+			toRemove->next->prev = toRemove->prev;
+		}
+	}
 	sys_req(WRITE, DEFAULT_DEVICE, success, success_len);
 }
 

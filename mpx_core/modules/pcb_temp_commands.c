@@ -34,7 +34,10 @@ void BlockPCB(char *processName){
 	if( pcb != NULL )
 	{
 		RemovePCB(pcb);
-		pcb->state = 2;
+		if (pcb->state == 0)
+			pcb->state = 2;
+		else
+			pcb->state = 3;
 		InsertPCB(pcb);
 	}
 	else
@@ -52,7 +55,10 @@ void UnblockPCB(char *processName){
 	if( pcb != NULL )
 	{
 		RemovePCB(pcb);
-		pcb->state = 0;
+		if (pcb->state == 2)
+			pcb->state = 0;
+		else
+			pcb->state = 1;
 		InsertPCB(pcb);
 	}
 	else
