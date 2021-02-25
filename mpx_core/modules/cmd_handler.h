@@ -14,6 +14,8 @@ void getdate();
 
 void optional_cmd_handler(char * cmd_buffer);
 
+void help();
+
 void cmd_handler();
 
 /**

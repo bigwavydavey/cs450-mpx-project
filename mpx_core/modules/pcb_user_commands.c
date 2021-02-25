@@ -4,6 +4,16 @@
 #include "structs.h"
 int buffer_length = 99;
 
+/**
+  @brief This function changes the state
+         of a user selected PCB to suspended
+         and inserts it into the correct
+         queue
+  
+  @param processName: name of PCB to alter
+
+  @retval none
+*/
 void SuspendPCB(char *processName){
 	/*
 		check name
@@ -26,6 +36,16 @@ void SuspendPCB(char *processName){
   }
 }
 
+/**
+  @brief This function changes the state
+         of a user selected PCB to unsuspended
+         and inserts it into the correct
+         queue
+  
+  @param processName: name of PCB to alter
+
+  @retval none
+*/
 void ResumePCB(char *processName){
 	/*
 		check name
@@ -48,6 +68,15 @@ void ResumePCB(char *processName){
   }
 }
 
+/**
+  @brief This function displays a user
+         selected PCB to the terminal
+  
+  @param processName: name of PCB to alter
+  @param priority: new value to set as PCB priority
+
+  @retval none
+*/
 void SetPCBPriority(char *processName, int priority){
 	/*
 		check name and priority
@@ -57,7 +86,14 @@ void SetPCBPriority(char *processName, int priority){
   struct pcb *pcb = FindPCB(processName);
   pcb->priority = priority;
 }
+/**
+  @brief This function displays a user
+         selected PCB to the terminal
+  
+  @param processName: name of PCB to display
 
+  @retval none
+*/
 void ShowPCB(char *processName)
 {
 	/*
@@ -106,6 +142,13 @@ void ShowPCB(char *processName)
   }
 }
 
+/**
+  @brief This function displays all currently
+         ready PCBs
+  @param none
+
+  @retval none
+*/
 void ShowReady(){
 	/*
 		struct PCB pcb = ReadyQueueHead
@@ -116,18 +159,32 @@ void ShowReady(){
   struct pcb *pcb = ready_suspended.head;
   sys_req(WRITE, DEFAULT_DEVICE, "Ready:\n", &buffer_length);
 
-  while( pcb->next != NULL )
+  if(ready_suspended.head == NULL && ready_not_suspended.head == NULL)
+    sys_req(WRITE, DEFAULT_DEVICE, "There are no ready processes.");
+  else
   {
-    ShowPCB(pcb->name);
-  }
+    while( pcb->next != NULL )
+    {
+      ShowPCB(pcb->name);
+      pcb = pcb->next;
+    }
 
-  *pcb = *(ready_not_suspended.head);
-  while( pcb->next != NULL )
-  {
-    ShowPCB(pcb->name);
+    *pcb = *(ready_not_suspended.head);
+    while( pcb->next != NULL )
+    {
+      ShowPCB(pcb->name);
+      pcb = pcb->next
+    }
   }
 }
 
+/**
+  @brief This function displays all currently
+         blocked PCBs
+  @param none
+
+  @retval none
+*/
 void ShowBlocked(){
 	/*
 		struct PCB pcb = BlockedQueueHead
@@ -138,18 +195,32 @@ void ShowBlocked(){
   struct pcb *pcb = blocked_suspended.head;
   sys_req(WRITE, DEFAULT_DEVICE, "Blocked:\n", &buffer_length);
 
-  while( pcb->next != NULL )
+  if(blocked_suspended.head == NULL && blocked_not_suspended.head == NULL)
+    sys_req(WRITE, DEFAULT_DEVICE, "There are no blocked processes.");
+  else
   {
-    ShowPCB(pcb->name);
-  }
+    while( pcb->next != NULL )
+    {
+      ShowPCB(pcb->name);
+      pcb = pcb->next;
+    }
 
-  *pcb = *(blocked_not_suspended.head);
-  while( pcb->next != NULL )
-  {
-    ShowPCB(pcb->name);
+    *pcb = *(blocked_not_suspended.head);
+    while( pcb->next != NULL )
+    {
+      ShowPCB(pcb->name);
+      pcb = pcb->next;
+    }
   }
 }
+/**
+  @brief This function combines the ShowReady()
+         function and the ShowBlocked() function
+         to display all existing PCBS
+  @param none
 
+  @retval none
+*/
 void ShowAll(){
   ShowReady();
   ShowBlocked();

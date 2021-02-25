@@ -229,6 +229,16 @@ void getdate()
   sys_req(WRITE, DEFAULT_DEVICE, date, &buffer);
 }
 
+/**
+  @brief This function is a supplementary function to
+         cmd_handler() that specifically handles commands
+         with user input and optional clauses.
+         Splits cmd_buffer into various tokens.
+
+  @param cmd_buffer: the buffer that is passed from cmd_buffer()
+                      to this function
+  @retval none
+*/
 void optional_cmd_handler(char * cmd_buffer)
 {
   char * cmd = strtok(cmd_buffer, " ");
@@ -287,6 +297,53 @@ void optional_cmd_handler(char * cmd_buffer)
   }
 }
 
+/**
+  @brief This function provides functionality for the help
+         user command.
+
+  @param none
+
+  @retval none
+*/
+void help()
+{
+      //R1 commands
+      sys_req(WRITE, DEFAULT_DEVICE, "\nhelp: prints list of commands and explains their functionality\n", &buffer_size);
+      sys_req(WRITE, DEFAULT_DEVICE, "\nversion: prints the current version of OS Allstars' MPX and most recent\nrelease date\n", &buffer_size);
+      sys_req(WRITE, DEFAULT_DEVICE,  "\nshutdown: shutsdown the MPX system. You will be asked for confirmation\n", &buffer_size);
+      sys_req(WRITE, DEFAULT_DEVICE, "\ngetdate: prints current date as stored in MPX register\n", &buffer_size);
+      sys_req(WRITE, DEFAULT_DEVICE, "\nsetdate: sets a user input date to the register\n", &buffer_size);
+      sys_req(WRITE, DEFAULT_DEVICE, "\ngettime: prints the current time of day as stored in MPX register\n", &buffer_size);
+      sys_req(WRITE, DEFAULT_DEVICE, "\nsettime: sets a user input time of day to the register\n", &buffer_size);
+
+      //R2 commands
+      sys_req(WRITE, DEFAULT_DEVICE, "\ncreatepcb [pcb_name] [pcb_class] [pcb_priority]: This commands will create a new PCB for 
+              the given attributes, pcb_name, pcb_priority, pcb_class.\n", &buffer_size);
+      sys_req(WRITE, DEFAULT_DEVICE, "\ndeleteocb [pcb_name]: This command will delete a selected pcb from all 4 of the PCB queues, removing
+              them completely from the system. pcb_name must be a valid PCB already in
+              existence.\n", &buffer_size);
+      sys_req(WRITE, DEFAULT_DEVICE, "\nblockpcb [pcb_name]: This command will set the selected PCB’s state to blocked and insert it into the
+              appropriate PCB queue. pcb_name must be a valid PCB already in existence. \n", &buffer_size);
+      sys_req(WRITE, DEFAULT_DEVICE, "\nunblockpcb [pcb_name]: This command will set the selected PCB’s state to unblocked and insert it into the
+              appropriate PCB queue. pcb_name must be a valid PCB already in existence. \n", &buffer_size);
+      sys_req(WRITE, DEFAULT_DEVICE, "\nsuspendpcb [pcb_name]: This command will set the selected PCB’s state to suspended and insert it into
+              the appropriate PCB queue. pcb_name must be a valid PCB already in existence.  \n", &buffer_size);
+      sys_req(WRITE, DEFAULT_DEVICE, "\nresumepcb [pcb_name]: This command will set the selected PCB’s state to unsuspended and insert it into
+              the appropriate PCB queue. pcb_name must be a valid PCB already in existence.  \n", &buffer_size);
+      sys_req(WRITE, DEFAULT_DEVICE, "\nsetpriority [pcb_name]: This command will set the selected PCB’s priority to a new user desired priority,
+              possibly changing its location withing the queues. pcb_name and pcb_priority
+              must both be valid\n", &buffer_size);
+      sys_req(WRITE, DEFAULT_DEVICE, "\nshowpcb [pcb_name]: This command will display the attributes of a selected PCB in the terminal. These
+              attributes include process_name, class, state, suspended_status, and priority\n", &buffer_size);
+      sys_req(WRITE, DEFAULT_DEVICE, "\nshowreadypcb: This command will display all processes contained within the two ready queues in
+              the terminal.\n", &buffer_size);
+      sys_req(WRITE, DEFAULT_DEVICE, "\nshowreadypcb: This command will display all processes contained within the two ready queues in
+              the terminal.\n", &buffer_size);
+      sys_req(WRITE, DEFAULT_DEVICE, "\nshowblkpcb: This command will display all processes contained within the two blocked queues in
+              the terminal.\n", &buffer_size);
+      sys_req(WRITE, DEFAULT_DEVICE, "\nshowpcbs: This commands will display all existing processes, in all four queues, in the
+              terminal.\n", &buffer_size);
+}
 /**
 
   @brief This function has a loop to continuously handle specific
@@ -361,13 +418,7 @@ void cmd_handler()
     //Help command
     else if (strcmp(cmd_buffer, "help\r") == 0)
     { 
-      sys_req(WRITE, DEFAULT_DEVICE, "\nhelp: prints list of commands and explains their functionality\n", &buffer_size);
-      sys_req(WRITE, DEFAULT_DEVICE, "\nversion: prints the current version of OS Allstars' MPX and most recent\nrelease date\n", &buffer_size);
-      sys_req(WRITE, DEFAULT_DEVICE,  "\nshutdown: shutsdown the MPX system. You will be asked for confirmation\n", &buffer_size);
-      sys_req(WRITE, DEFAULT_DEVICE, "\ngetdate: prints current date as stored in MPX register\n", &buffer_size);
-      sys_req(WRITE, DEFAULT_DEVICE, "\nsetdate: sets a user input date to the register\n", &buffer_size);
-      sys_req(WRITE, DEFAULT_DEVICE, "\ngettime: prints the current time of day as stored in MPX register\n", &buffer_size);
-      sys_req(WRITE, DEFAULT_DEVICE, "\nsettime: sets a user input time of day to the register\n", &buffer_size);
+      help();
     }
     else if (strcmp(cmd_buffer, "settime\r") == 0)
     {
