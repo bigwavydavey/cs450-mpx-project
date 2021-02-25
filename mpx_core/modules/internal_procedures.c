@@ -8,7 +8,13 @@ struct queue ready_not_suspended;
 struct queue blocked_suspended;
 struct queue blocked_not_suspended;
 
-
+/**
+* This function is used to allocate memory for a pcb
+* and initializes the stack to null
+*
+*  @retval pcb*: returns a pcb pointer 
+* 
+*/
 struct pcb * AllocatePCB(){
 	int stack_size = 1024;
 	struct pcb *PCB;
@@ -25,6 +31,15 @@ struct pcb * AllocatePCB(){
 	return NULL;
 }
 
+/**
+* This function is used to search through the 4 queues to find a specific pcb
+*
+* @param  processName: The name of the process is passed in as a pointer
+* 
+*
+*  @retval pbc*: returns a pcb pointer
+* 
+*/
 struct pcb * FindPCB(char *processName){
 	/*
 		search queues for PCB with processName
@@ -77,6 +92,14 @@ struct pcb * FindPCB(char *processName){
 	return NULL;
 }
 
+/**
+* This function is used to free a pcb from memory  
+* Success is printed if the command is successful
+* if an the pcb is not freed Error is printed
+*
+* @param  PCB: the functions takes in a pcb pointer 
+* 
+*/
 void FreePCB(struct pcb *PCB){
 	char * success = "Success!\0";
 	int success_size = strlen(success);
@@ -93,6 +116,12 @@ void FreePCB(struct pcb *PCB){
 	}
 }
 
+/**
+* This function is used to insert a pcb into its correct queue
+*
+* @param  PCB: pcb pointer 
+*
+*/
 void InsertPCB(struct pcb *PCB){
 /*
 	if tail has higher priority than PCB
@@ -186,6 +215,15 @@ void InsertPCB(struct pcb *PCB){
 
 }
 
+/**
+* This function is used to remove a pcb from a queue, 
+* Success is printed if th epcb is removed 
+* Error is printed if there was an issues removing the pcb
+*
+* @param  PCB: a pointer to a specific pcb
+*
+* 
+*/
 void RemovePCB(struct pcb *PCB){
 	//remove from queue
 	//return success or error code
@@ -207,11 +245,22 @@ void RemovePCB(struct pcb *PCB){
 	sys_req(WRITE, DEFAULT_DEVICE, success, success_len);
 }
 
+/**
+* This function is used to place a pcb in the memory that has been allocated for it
+* as well as neccessary initialization. Inserts into ready not suspened queue
+*
+* @param  processName: a charcter pointer to what the user would like the pcb to be called
+* @param  class: an integer indicating whether the pcb is an application or system process
+* @param  priority: an integer indicating the priority of the pcb 
+
+  @retval count: pointer to the pcb that has just been allocated to memory and initialized 
+* 
+*/
 struct pcb * SetupPCB(char * processName, int class, int priority){
 	struct pcb *pcb_point;
 	pcb_point = AllocatePCB();
 	strcpy(pcb_point->name, processName);
-	//serial_println(pcb_point->name);
+	
 	pcb_point->class = class;
 	pcb_point->priority = priority;
 	pcb_point->state = 0;
