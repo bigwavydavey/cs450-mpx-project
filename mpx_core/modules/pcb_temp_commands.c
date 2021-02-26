@@ -1,6 +1,7 @@
 #include "internal_procedures.h"
 #include "structs.h"
 #include "mpx_supt.h"
+#include <string.h>
 
 /**
 * @brief This function will create a new PCB by calling the internal function SetupPCB
@@ -16,8 +17,10 @@ void CreatePCB(char *processName, int class, int priority){
 
 	if( pcb != NULL || priority < 0 || priority > 9 || class < 0 || class > 1 )
 		sys_req(WRITE, DEFAULT_DEVICE,"\nInvalid input. Aborting createpcb command...\n", &buffer_size);
-	else
+	else{
 		SetupPCB(processName, class, priority);
+		sys_req(WRITE, DEFAULT_DEVICE, "\nPCB was created successfully", &buffer_size);
+	}
 }
 
 /**

@@ -241,19 +241,25 @@ void getdate()
 */
 void optional_cmd_handler(char * cmd_buffer)
 {
-  char * cmd = strtok(cmd_buffer, " ");
-  char * pcb_name = strtok(NULL, " ");
-
-  if (strcmp(cmd, "createpcb") == 0)
+  char delim[2] = " \0";
+  char * cmd = strtok(cmd_buffer, delim);
+  char * pcb_name = strtok(NULL, delim);
+  if (strlen(pcb_name) > 10){
+    sys_req(WRITE, DEFAULT_DEVICE, "\nERROR: Name must be no bigger than 10 characters", &buffer_size);
+  }
+  else if (strcmp(cmd, "createpcb") == 0)
   {
-    //char * pcb_priority_s = strtok(NULL, " ");
-    char * class_s = strtok(NULL, " ");
-    //int pcb_priority = atoi(pcb_priority_s);
+    char * class_s = strtok(NULL, delim);
     int class = atoi(class_s);
+    char pcb_priority_s[10];
+    char *point = pcb_priority_s;
+    point = strtok(NULL, delim);
+    int pcb_priority = atoi(point);
 
-    CreatePCB(pcb_name, class, 1);
-
-    sys_req(WRITE, DEFAULT_DEVICE, "\nNew PCB successfully created.\n", &buffer_size);
+    if (pcb_priority == 10){
+      serial_println("help");
+    }
+    CreatePCB(pcb_name, class, pcb_priority);
   }
   else if (strcmp(cmd, "deletepcb") == 0)
   {
@@ -285,7 +291,7 @@ void optional_cmd_handler(char * cmd_buffer)
   else if (strcmp(cmd, "showpcb") == 0)
   {
     ShowPCB(pcb_name);
-  }  
+  }
   //Command not recognized
   else
   {
@@ -376,13 +382,13 @@ void cmd_handler()
 
 
     //Version command
-    if (strcmp(cmd_buffer, "version\r") == 0) // see if buffer matches version command
+    if (strcmp(cmd_buffer, "version") == 0) // see if buffer matches version command
     {
       char * current_version = "\nOS Allstars' MPX Version 1.0, last updated Feb 11, 2021\n";
       sys_req(WRITE, DEFAULT_DEVICE, current_version, &buffer_size);
     }
     //Shutdown command
-    else if (strcmp(cmd_buffer, "shutdown\r") == 0)
+    else if (strcmp(cmd_buffer, "shutdown") == 0)
     {
       sys_req(WRITE, DEFAULT_DEVICE, "\nAre you sure you want to shutdown the system? (y/n)\n\n>>", &buffer_size);
 
@@ -391,9 +397,9 @@ void cmd_handler()
       int shutdown_buffer_size = 9;
       sys_req(READ, DEFAULT_DEVICE, shutdown_buffer, &shutdown_buffer_size);
 
-      if (strcmp(shutdown_buffer, "y\r") == 0)
+      if (strcmp(shutdown_buffer, "y") == 0)
         quit = 1; //exits cmd_handler
-      else if (strcmp(shutdown_buffer, "n\r") == 0)
+      else if (strcmp(shutdown_buffer, "n") == 0)
       {
         sys_req(WRITE, DEFAULT_DEVICE, "\nAborting shutdown...\n", &buffer_size);
       }
@@ -402,11 +408,11 @@ void cmd_handler()
     }
 
     //Help command
-    else if (strcmp(cmd_buffer, "help\r") == 0)
+    else if (strcmp(cmd_buffer, "help") == 0)
     { 
       help();
     }
-    else if (strcmp(cmd_buffer, "settime\r") == 0)
+    else if (strcmp(cmd_buffer, "settime") == 0)
     {
       sys_req(WRITE, DEFAULT_DEVICE, "Please enter time in HH:MM:SS format\n", &buffer_size);
 
@@ -417,12 +423,12 @@ void cmd_handler()
       settime(time_buffer, time_buffer_size);
     }
 
-    else if (strcmp(cmd_buffer, "gettime\r") == 0)
+    else if (strcmp(cmd_buffer, "gettime") == 0)
     {
       gettime();
     }
 
-    else if (strcmp(cmd_buffer, "setdate\r") == 0)
+    else if (strcmp(cmd_buffer, "setdate") == 0)
     {
       sys_req(WRITE, DEFAULT_DEVICE, "\nPlease enter time in MM/DD/YYYY format\n", &buffer_size);
 
@@ -433,19 +439,19 @@ void cmd_handler()
       setdate(date_buffer, date_buffer_size);
     }
 
-    else if (strcmp(cmd_buffer, "getdate\r") == 0)
+    else if (strcmp(cmd_buffer, "getdate") == 0)
     {
       getdate();
     }
-    else if (strcmp(cmd_buffer, "showpcbs\r") == 0)
+    else if (strcmp(cmd_buffer, "showpcbs") == 0)
     {
       ShowAll(); 
     }
-    else if (strcmp(cmd_buffer, "showblkpcb\r") == 0)
+    else if (strcmp(cmd_buffer, "showblkpcb") == 0)
     {
       ShowBlocked();  
     }
-  else if (strcmp(cmd_buffer, "showreadypcb\r") == 0)
+  else if (strcmp(cmd_buffer, "showreadypcb") == 0)
     {
       ShowReady();  
     }

@@ -1,5 +1,4 @@
 #include "mpx_supt.h"
-#include <core/serial.h>
 #include "structs.h"
 #include <string.h>
 
@@ -18,11 +17,10 @@ struct queue blocked_not_suspended;
 struct pcb * AllocatePCB(){
 	int stack_size = 1024;
 	struct pcb *PCB;
-	PCB = sys_alloc_mem(sizeof(PCB));
+	PCB = sys_alloc_mem(sizeof(struct pcb));
 	PCB->base = PCB->stack;
 	PCB->top = PCB->base + stack_size;
 	int loop_control = 0;
-	//int loop_end = (int) PCB->top;
 	while (loop_control < stack_size){
 		PCB->stack[loop_control] = '\0';
 		loop_control++;
@@ -101,18 +99,18 @@ struct pcb * FindPCB(char *processName){
 * 
 */
 void FreePCB(struct pcb *PCB){
-	char * success = "Success!\0";
+	/*char * success = "\nSuccess!\0";
 	int success_size = strlen(success);
 	int *success_len = &success_size;
-	char * failure = "ERROR: The PCB could not be freed from memory\0";
+	char * failure = "\nERROR: The PCB could not be freed from memory\0";
 	int failure_size = strlen(failure);
-	int *failure_len = &failure_size;
+	int *failure_len = &failure_size;*/
 
 	if (sys_free_mem(PCB) == -1){
-		sys_req(WRITE, DEFAULT_DEVICE, failure, failure_len);
+		//sys_req(WRITE, DEFAULT_DEVICE, failure, failure_len);
 	}
 	else{
-		sys_req(WRITE, DEFAULT_DEVICE, success, success_len);
+		//sys_req(WRITE, DEFAULT_DEVICE, success, success_len);
 	}
 }
 
@@ -139,7 +137,13 @@ void InsertPCB(struct pcb *PCB){
 		{
 			ready_not_suspended.tail->next= PCB;
 			PCB->prev = ready_not_suspended.tail;
-			ready_not_suspended.tail = PCB;		}
+			ready_not_suspended.tail = PCB;		
+		}
+		else if (PCB->priority > ready_not_suspended.head->priority){
+			PCB->next = ready_not_suspended.head;
+			ready_not_suspended.head->prev = PCB;
+			ready_not_suspended.head = PCB;
+		}
 		else
 		{
 			struct pcb *current= ready_not_suspended.head;
@@ -147,10 +151,10 @@ void InsertPCB(struct pcb *PCB){
 			{
 				current = current->next;
 			}
-			current->next->prev = PCB;
-			PCB->next = current->next;
-			PCB->prev = current;
-			current->next = PCB;
+			PCB->prev = current->prev;
+			current->prev->next = PCB;
+			current->prev = PCB;
+			PCB->next = current;
 		}
 		ready_not_suspended.count++;
 
@@ -161,11 +165,16 @@ void InsertPCB(struct pcb *PCB){
 			ready_suspended.head = PCB;
 			ready_suspended.tail = PCB;
 		}
-		if (ready_suspended.tail->priority >= PCB->priority)
+		else if (ready_suspended.tail->priority >= PCB->priority)
 		{
 			ready_suspended.tail->next= PCB;
 			PCB->prev = ready_suspended.tail;
 			ready_suspended.tail = PCB;
+		}
+		else if (PCB->priority > ready_not_suspended.head->priority){
+			PCB->next = ready_suspended.head;
+			ready_suspended.head->prev = PCB;
+			ready_suspended.head = PCB;
 		}
 		else
 		{
@@ -174,10 +183,10 @@ void InsertPCB(struct pcb *PCB){
 			{
 				current = current->next;
 			}
-			current->next->prev = PCB;
-			PCB->next = current->next;
-			PCB->prev = current;
-			current->next = PCB;
+			PCB->prev = current->prev;
+			current->prev->next = PCB;
+			current->prev = PCB;
+			PCB->next = current;
 		}
 		ready_suspended.count++;
 	}
@@ -227,10 +236,10 @@ void InsertPCB(struct pcb *PCB){
 void RemovePCB(struct pcb *PCB){
 	//remove from queue
 	//return success or error code
-	char * success = "Success!\0";
+	char * success = "\nRemoved successfully!\n\0";
 	int success_size = strlen(success);
 	int *success_len = &success_size;
-	char * failure = "ERROR: The PCB could not be removed\0";
+	char * failure = "\nERROR: The PCB could not be removed\n\0";
 	int failure_size = strlen(failure);
 	int *failure_len = &failure_size;
 
@@ -256,6 +265,7 @@ void RemovePCB(struct pcb *PCB){
 			toRemove->prev->next = toRemove->next;
 			toRemove->next->prev = toRemove->prev;
 		}
+		ready_not_suspended.count--;
 	}
 	else if (toRemove->state == 1){
 		if (ready_suspended.count == 1){
@@ -274,6 +284,7 @@ void RemovePCB(struct pcb *PCB){
 			toRemove->prev->next = toRemove->next;
 			toRemove->next->prev = toRemove->prev;
 		}
+		ready_suspended.count--;
 	}
 	else if (toRemove->state == 2){
 		if (blocked_not_suspended.count == 1){
@@ -292,6 +303,7 @@ void RemovePCB(struct pcb *PCB){
 			toRemove->prev->next = toRemove->next;
 			toRemove->next->prev = toRemove->prev;
 		}
+		blocked_not_suspended.count--;
 	}
 	else {
 		if (blocked_suspended.count == 1){
@@ -310,6 +322,7 @@ void RemovePCB(struct pcb *PCB){
 			toRemove->prev->next = toRemove->next;
 			toRemove->next->prev = toRemove->prev;
 		}
+		blocked_suspended.count--;
 	}
 	sys_req(WRITE, DEFAULT_DEVICE, success, success_len);
 }
@@ -327,6 +340,8 @@ void RemovePCB(struct pcb *PCB){
 */
 struct pcb * SetupPCB(char * processName, int class, int priority){
 	struct pcb *pcb_point;
+	struct pcb PCB;
+	pcb_point = &PCB;
 	pcb_point = AllocatePCB();
 	strcpy(pcb_point->name, processName);
 	

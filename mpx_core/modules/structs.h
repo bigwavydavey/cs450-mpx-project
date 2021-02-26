@@ -10,7 +10,7 @@ struct queue
 
 struct pcb
 {
-	char name[100];
+	char name[10];
 	int class;
 	int priority;
 	// 0- ready not suspended, 1- ready suspended, 2- blocked non suspended, 3- blcoked suspended, 5- running

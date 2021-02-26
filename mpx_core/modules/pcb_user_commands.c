@@ -1,10 +1,9 @@
 #include <string.h>
-#include <core/serial.h>
 #include "internal_procedures.h"
 #include "mpx_supt.h"
 #include "structs.h"
 int buffer_length = 99;
-
+char input[1];
 /**
   @brief This function changes the state
          of a user selected PCB to suspended
@@ -127,21 +126,18 @@ void ShowPCB(char *processName)
   }
   else
   {
-    char * class_s = "";
-    itoa(display_pcb->class, class_s, 10);
-    char * priority_s = "";
-    itoa(display_pcb->priority, priority_s, 10);
-    char * state_s = "";
-    itoa(display_pcb->state, state_s, 10);
-
-    sys_req(WRITE, DEFAULT_DEVICE, "\nProcess Name: ", &buffer_length);
+  	sys_req(WRITE, DEFAULT_DEVICE, "\nProcess Name: ", &buffer_length);
     sys_req(WRITE, DEFAULT_DEVICE, display_pcb->name, &buffer_length);
     sys_req(WRITE, DEFAULT_DEVICE, "\nClass: ", &buffer_length);
-    sys_req(WRITE, DEFAULT_DEVICE, class_s, &buffer_length);
+    itoa(display_pcb->class, input, 10);
+    sys_req(WRITE, DEFAULT_DEVICE, input, &buffer_length);
     sys_req(WRITE, DEFAULT_DEVICE, "\nPriority: ", &buffer_length);
-    sys_req(WRITE, DEFAULT_DEVICE, priority_s, &buffer_length);
+    itoa(display_pcb->priority, input, 10);
+    sys_req(WRITE, DEFAULT_DEVICE, input, &buffer_length);
+    itoa(display_pcb->state, input, 10);
+
     sys_req(WRITE, DEFAULT_DEVICE, "\nState: ", &buffer_length);
-    sys_req(WRITE, DEFAULT_DEVICE, state_s, &buffer_length);
+    sys_req(WRITE, DEFAULT_DEVICE, input, &buffer_length);
 
     sys_req(WRITE, DEFAULT_DEVICE, "\nSuspended status: ", &buffer_length);
     if (display_pcb->state == 0)
@@ -173,13 +169,13 @@ void ShowReady(){
 		while pcb.next != NULL
 		ShowPCB(pcb.processName);
 	*/
-  sys_req(WRITE, DEFAULT_DEVICE, "Ready:\n", &buffer_length);
+  sys_req(WRITE, DEFAULT_DEVICE, "\nReady:", &buffer_length);
   struct pcb *pcb;
   if(ready_suspended.head == NULL && ready_not_suspended.head == NULL)
     sys_req(WRITE, DEFAULT_DEVICE, "There are no ready processes.", &buffer_length);
   else if(ready_suspended.head == NULL){
     pcb = ready_not_suspended.head;
-    while( pcb->next != NULL )
+    while( pcb != NULL )
     {
       ShowPCB(pcb->name);
       pcb = pcb->next;
@@ -187,7 +183,7 @@ void ShowReady(){
   }
   else if (ready_not_suspended.head == NULL){
     pcb = ready_suspended.head;
-    while( pcb->next != NULL )
+    while( pcb != NULL )
     {
       ShowPCB(pcb->name);
       pcb = pcb->next;
@@ -195,13 +191,13 @@ void ShowReady(){
   }
   else{
     pcb = ready_suspended.head;
-    while( pcb->next != NULL )
+    while( pcb != NULL )
     {
       ShowPCB(pcb->name);
       pcb = pcb->next;
     }
     pcb = ready_not_suspended.head;
-    while( pcb->next != NULL )
+    while( pcb != NULL )
     {
       ShowPCB(pcb->name);
       pcb = pcb->next;
@@ -224,20 +220,34 @@ void ShowBlocked(){
 		ShowPCB(pcb.processName);
 	*/
   struct pcb *pcb = blocked_suspended.head;
-  sys_req(WRITE, DEFAULT_DEVICE, "\nBlocked:\n", &buffer_length);
+  sys_req(WRITE, DEFAULT_DEVICE, "\nBlocked:", &buffer_length);
 
   if(blocked_suspended.head == NULL && blocked_not_suspended.head == NULL)
     sys_req(WRITE, DEFAULT_DEVICE, "There are no blocked processes.", &buffer_length);
-  else
-  {
-    while( pcb->next != NULL )
+  else if(blocked_suspended.head == NULL){
+   	pcb = blocked_not_suspended.head;
+   	while( pcb != NULL ) 	{
+      	ShowPCB(pcb->name);
+      	pcb = pcb->next;
+    }
+  }
+  else if (blocked_not_suspended.head == NULL){
+    pcb = blocked_suspended.head;
+    while( pcb != NULL )
     {
       ShowPCB(pcb->name);
       pcb = pcb->next;
     }
-
-    *pcb = *(blocked_not_suspended.head);
-    while( pcb->next != NULL )
+  }
+  else{
+    pcb = blocked_suspended.head;
+    while( pcb != NULL )
+    {
+      ShowPCB(pcb->name);
+      pcb = pcb->next;
+    }
+    pcb = blocked_not_suspended.head;
+    while( pcb != NULL )
     {
       ShowPCB(pcb->name);
       pcb = pcb->next;
