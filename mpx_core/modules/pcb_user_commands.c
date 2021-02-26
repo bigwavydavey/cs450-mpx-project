@@ -99,7 +99,12 @@ void SetPCBPriority(char *processName, int priority){
     sys_req(WRITE, DEFAULT_DEVICE, "\nERROR:The pcb you entered does not exist\n", &buffer_length);
   else
   {
-    pcb->priority = priority;
+    if (priority < 0 || priority > 9)
+      sys_req(WRITE, DEFAULT_DEVICE, "\nERROR:The priority value is invalid\n", &buffer_length);
+    else
+      pcb->priority = priority;
+      RemovePCB(pcb);
+      InsertPCB(pcb);
   }
 }
 /**

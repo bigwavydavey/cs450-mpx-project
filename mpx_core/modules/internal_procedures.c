@@ -324,6 +324,8 @@ void RemovePCB(struct pcb *PCB){
 		}
 		blocked_suspended.count--;
 	}
+	toRemove->next = NULL;
+	toRemove->prev = NULL;
 	sys_req(WRITE, DEFAULT_DEVICE, success, success_len);
 }
 
