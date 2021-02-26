@@ -141,17 +141,17 @@ void ShowPCB(char *processName)
 
     sys_req(WRITE, DEFAULT_DEVICE, "\nSuspended status: ", &buffer_length);
     if (display_pcb->state == 0)
-      sys_req(WRITE, DEFAULT_DEVICE, "ready, not suspended", &buffer_length);
+      sys_req(WRITE, DEFAULT_DEVICE, "ready, not suspended\n", &buffer_length);
     else if (display_pcb->state == 1)
-      sys_req(WRITE, DEFAULT_DEVICE, "ready, suspended", &buffer_length);
+      sys_req(WRITE, DEFAULT_DEVICE, "ready, suspended\n", &buffer_length);
     else if (display_pcb->state == 2)
-      sys_req(WRITE, DEFAULT_DEVICE, "blocked, not suspended", &buffer_length);
+      sys_req(WRITE, DEFAULT_DEVICE, "blocked, not suspended\n", &buffer_length);
     else if (display_pcb->state == 3)
-      sys_req(WRITE, DEFAULT_DEVICE, "blocked, suspended", &buffer_length);
+      sys_req(WRITE, DEFAULT_DEVICE, "blocked, suspended\n", &buffer_length);
     else if (display_pcb->state == 5)
-      sys_req(WRITE, DEFAULT_DEVICE, "running", &buffer_length);
+      sys_req(WRITE, DEFAULT_DEVICE, "running\n", &buffer_length);
     else
-      sys_req(WRITE, DEFAULT_DEVICE, "UNKNOWN", &buffer_length);
+      sys_req(WRITE, DEFAULT_DEVICE, "UNKNOWN\n", &buffer_length);
   }
 }
 
@@ -169,10 +169,10 @@ void ShowReady(){
 		while pcb.next != NULL
 		ShowPCB(pcb.processName);
 	*/
-  sys_req(WRITE, DEFAULT_DEVICE, "\nReady:", &buffer_length);
+  sys_req(WRITE, DEFAULT_DEVICE, "\nReady:\n", &buffer_length);
   struct pcb *pcb;
   if(ready_suspended.head == NULL && ready_not_suspended.head == NULL)
-    sys_req(WRITE, DEFAULT_DEVICE, "There are no ready processes.", &buffer_length);
+    sys_req(WRITE, DEFAULT_DEVICE, "There are no ready processes.\n", &buffer_length);
   else if(ready_suspended.head == NULL){
     pcb = ready_not_suspended.head;
     while( pcb != NULL )
@@ -220,10 +220,10 @@ void ShowBlocked(){
 		ShowPCB(pcb.processName);
 	*/
   struct pcb *pcb = blocked_suspended.head;
-  sys_req(WRITE, DEFAULT_DEVICE, "\nBlocked:", &buffer_length);
+  sys_req(WRITE, DEFAULT_DEVICE, "\nBlocked:\n", &buffer_length);
 
   if(blocked_suspended.head == NULL && blocked_not_suspended.head == NULL)
-    sys_req(WRITE, DEFAULT_DEVICE, "There are no blocked processes.", &buffer_length);
+    sys_req(WRITE, DEFAULT_DEVICE, "There are no blocked processes.\n", &buffer_length);
   else if(blocked_suspended.head == NULL){
    	pcb = blocked_not_suspended.head;
    	while( pcb != NULL ) 	{
