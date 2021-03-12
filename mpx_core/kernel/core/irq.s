@@ -126,7 +126,7 @@ sys_call_isr:
 	push fs
 	push gs
 	push esp
-	call sys_call
+	call sys_call(esp)
 	mov esp, eax
 	pop gs
 	pop fs
