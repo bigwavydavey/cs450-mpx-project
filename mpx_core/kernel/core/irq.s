@@ -43,6 +43,7 @@ extern do_general_protection
 extern do_page_fault
 extern do_reserved
 extern do_coprocessor
+extern sys_call
 
 ; RTC interrupt handler
 ; Tells the slave PIC to ignore
@@ -126,10 +127,11 @@ sys_call_isr:
 	push fs
 	push gs
 	push esp
-	call sys_call(esp)
+	call sys_call
 	mov esp, eax
 	pop gs
 	pop fs
 	pop es
 	pop ds
+	popa
 	iret
