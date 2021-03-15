@@ -1,4 +1,5 @@
 #include "mpx_supt.h"
+#include "mpx_supt.c"
 #include "structs.h"
 #include "internal_procedures.h"
 
@@ -27,8 +28,8 @@ u32int* sys_call(struct context *registers )
     RemovePCB(rdy_process);
     rdy_process->state = 5;
     cop = rdy_process;
-    return cop->top;
+    return (u32int*)cop->top;
   }
   else
-    return cop->top;
+    return (u32int*)cop->top;
 }
