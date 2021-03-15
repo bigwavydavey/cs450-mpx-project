@@ -3,9 +3,9 @@
 #include "internal_procedures.h"
 
 struct pcb* cop;
-context *reference;
+struct context *reference;
 
-u32int* sys_call( context *registers )
+u32int* sys_call(struct context *registers )
 {
   if( cop == NULL )
   {
