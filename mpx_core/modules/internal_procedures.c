@@ -11,8 +11,8 @@ struct queue blocked_not_suspended;
 * This function is used to allocate memory for a pcb
 * and initializes the stack to null
 *
-*  @retval pcb*: returns a pcb pointer 
-* 
+*  @retval pcb*: returns a pcb pointer
+*
 */
 struct pcb * AllocatePCB(){
 	int stack_size = 1024;
@@ -33,10 +33,10 @@ struct pcb * AllocatePCB(){
 * This function is used to search through the 4 queues to find a specific pcb
 *
 * @param  processName: The name of the process is passed in as a pointer
-* 
+*
 *
 *  @retval pbc*: returns a pcb pointer
-* 
+*
 */
 struct pcb * FindPCB(char *processName){
 	/*
@@ -91,12 +91,12 @@ struct pcb * FindPCB(char *processName){
 }
 
 /**
-* This function is used to free a pcb from memory  
+* This function is used to free a pcb from memory
 * Success is printed if the command is successful
 * if an the pcb is not freed Error is printed
 *
-* @param  PCB: the functions takes in a pcb pointer 
-* 
+* @param  PCB: the functions takes in a pcb pointer
+*
 */
 void FreePCB(struct pcb *PCB){
 	/*char * success = "\nSuccess!\0";
@@ -117,7 +117,7 @@ void FreePCB(struct pcb *PCB){
 /**
 * This function is used to insert a pcb into its correct queue
 *
-* @param  PCB: pcb pointer 
+* @param  PCB: pcb pointer
 *
 */
 void InsertPCB(struct pcb *PCB){
@@ -137,7 +137,7 @@ void InsertPCB(struct pcb *PCB){
 		{
 			ready_not_suspended.tail->next= PCB;
 			PCB->prev = ready_not_suspended.tail;
-			ready_not_suspended.tail = PCB;		
+			ready_not_suspended.tail = PCB;
 		}
 		else if (PCB->priority > ready_not_suspended.head->priority){
 			PCB->next = ready_not_suspended.head;
@@ -225,13 +225,13 @@ void InsertPCB(struct pcb *PCB){
 }
 
 /**
-* This function is used to remove a pcb from a queue, 
-* Success is printed if th epcb is removed 
+* This function is used to remove a pcb from a queue,
+* Success is printed if th epcb is removed
 * Error is printed if there was an issues removing the pcb
 *
 * @param  PCB: a pointer to a specific pcb
 *
-* 
+*
 */
 void RemovePCB(struct pcb *PCB){
 	//remove from queue
@@ -335,10 +335,10 @@ void RemovePCB(struct pcb *PCB){
 *
 * @param  processName: a charcter pointer to what the user would like the pcb to be called
 * @param  class: an integer indicating whether the pcb is an application or system process
-* @param  priority: an integer indicating the priority of the pcb 
+* @param  priority: an integer indicating the priority of the pcb
 
-  @retval count: pointer to the pcb that has just been allocated to memory and initialized 
-* 
+  @retval count: pointer to the pcb that has just been allocated to memory and initialized
+*
 */
 struct pcb * SetupPCB(char * processName, int class, int priority){
 	struct pcb *pcb_point;
@@ -346,10 +346,11 @@ struct pcb * SetupPCB(char * processName, int class, int priority){
 	pcb_point = &PCB;
 	pcb_point = AllocatePCB();
 	strcpy(pcb_point->name, processName);
-	
+
 	pcb_point->class = class;
 	pcb_point->priority = priority;
 	pcb_point->state = 0;
+	pcb_point->top = pcb_point->base + 1024 - sizeof(struct context);
 	InsertPCB(pcb_point);
 	return pcb_point;
 }
