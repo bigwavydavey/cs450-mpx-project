@@ -1,6 +1,6 @@
 #include "structs.h"
 #include "userR3Commands.h"
-
+#include "procsr3.h"
 void yield(){
 	asm volatile ("int $60");
 }
