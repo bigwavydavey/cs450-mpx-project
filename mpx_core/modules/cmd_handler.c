@@ -409,6 +409,9 @@ void cmd_handler()
       {
         //quit = 1; //exits cmd_handler
         RemovePCB(FindPCB("idle"));
+        RemovePCB(FindPCB("alarm"));
+        if (FindPCB("infinite") != NULL)
+          RemovePCB(FindPCB("infinite"));
         sys_req(EXIT, DEFAULT_DEVICE, NULL, NULL);
       }
       else if (strcmp(shutdown_buffer, "n") == 0)
