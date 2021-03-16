@@ -176,7 +176,7 @@ void idle()
   int count=0;
 
 	memset( msg, '\0', sizeof(msg));
-	strcpy(msg, "IDLE PROCESS EXECUTING.\n");
+	strcpy(msg, "\nIDLE PROCESS EXECUTING.\n");
 	count = strlen(msg);
 
   while(1){
@@ -188,7 +188,7 @@ void idle()
 void infinite_proc()
 {
   int quit = 1;
-  char * idle_msg = "\nIdle process has been dispatched.";
+  char * idle_msg = "\nInfinite process has been dispatched.\n";
   int idle_msg_size = 34;
   
   while (!quit)
