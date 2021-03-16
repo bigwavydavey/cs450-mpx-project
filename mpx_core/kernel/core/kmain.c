@@ -50,7 +50,7 @@ void kmain(void)
    // 1) Initialize the support software by identifying the current
    //     MPX Module.  This will change with each module.
    // you will need to call mpx_init from the mpx_supt.c
-   mpx_init(MODULE_R2);
+   mpx_init(MODULE_R3);
 
    // 2) Check that the boot was successful and correct when using grub
    // Comment this when booting the kernel directly using QEMU, etc.
