@@ -33,7 +33,9 @@ void DeletePCB(char *processName){
 	int buffer_size = 60;
 	struct pcb *pcb = FindPCB(processName);
 
-	if( pcb != NULL ){
+	if(strcmp(processName, "idle") == 0 || strcmp(processName, "comhand") == 0)
+    	sys_req(WRITE, DEFAULT_DEVICE, "\nERROR:Cannot delete system processes\n", &buffer_size);
+	else if( pcb != NULL ){
 		RemovePCB(pcb);
 		FreePCB(pcb);
 	}
