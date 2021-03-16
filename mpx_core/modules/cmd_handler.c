@@ -326,10 +326,10 @@ void help()
   sys_req(WRITE, DEFAULT_DEVICE, "\nsettime: sets a user input time of day to the register\n", &buffer_size);
 
   //R2 commands
-  sys_req(WRITE, DEFAULT_DEVICE, "\ncreatepcb [pcb_name] [pcb_class] [pcb_priority]: This command will create a new PCB for the given attributes, pcb_name, pcb_priority, pcb_class.\n", &buffer_size);
+  //sys_req(WRITE, DEFAULT_DEVICE, "\ncreatepcb [pcb_name] [pcb_class] [pcb_priority]: This command will create a new PCB for the given attributes, pcb_name, pcb_priority, pcb_class.\n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, "\ndeleteocb [pcb_name]: This command will delete a selected pcb from all 4 of the PCB queues, removing them completely from the system. pcb_name must be a valid PCB already in existence.\n", &buffer_size);
-  sys_req(WRITE, DEFAULT_DEVICE, "\nblockpcb [pcb_name]: This command will set the selected PCB’s state to blocked and insert it into the appropriate PCB queue. pcb_name must be a valid PCB already in existence. \n", &buffer_size);
-  sys_req(WRITE, DEFAULT_DEVICE, "\nunblockpcb [pcb_name]: This command will set the selected PCB’s state to unblocked and insert it in to theappropriate PCB queue. pcb_name must be valid. \n", &buffer_size);
+  //sys_req(WRITE, DEFAULT_DEVICE, "\nblockpcb [pcb_name]: This command will set the selected PCB’s state to blocked and insert it into the appropriate PCB queue. pcb_name must be a valid PCB already in existence. \n", &buffer_size);
+  //sys_req(WRITE, DEFAULT_DEVICE, "\nunblockpcb [pcb_name]: This command will set the selected PCB’s state to unblocked and insert it in to theappropriate PCB queue. pcb_name must be valid. \n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, "\nsuspendpcb [pcb_name]: This command will set the selected PCB’s state to suspended and insert it in tothe appropriate PCB queue. pcb_name must be valid.  \n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, "\nresumepcb [pcb_name]: This command will set the selected PCB’s state to unsuspended and insert it in tothe appropriate PCB queue. pcb_name must be valid.  \n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, "\nsetpriority [pcb_name]: This command will set the selected PCB’s priority to a new user desired priority,\npossibly changing its location withing the queues. pcb_name and pcb_priority must be valid\n", &buffer_size);
@@ -468,5 +468,6 @@ void cmd_handler()
     {
       optional_cmd_handler(cmd_buffer);
     }
+  sys_req(IDLE, DEFAULT_DEVICE, NULL, NULL);
   }
 }
