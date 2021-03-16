@@ -248,7 +248,7 @@ void optional_cmd_handler(char * cmd_buffer)
   if (strlen(pcb_name) > 10){
     sys_req(WRITE, DEFAULT_DEVICE, "\nERROR: Name must be no bigger than 10 characters", &buffer_size);
   }
-  else if (strcmp(cmd, "createpcb") == 0)
+  /*else if (strcmp(cmd, "createpcb") == 0)
   {
     char * class_s = strtok(NULL, delim);
     int class = atoi(class_s);
@@ -261,19 +261,19 @@ void optional_cmd_handler(char * cmd_buffer)
       serial_println("help");
     }
     CreatePCB(pcb_name, class, pcb_priority);
-  }
+  }*/
   else if (strcmp(cmd, "deletepcb") == 0)
   {
     DeletePCB(pcb_name);
   }
-  else if (strcmp(cmd, "blockpcb") == 0)
+  /*else if (strcmp(cmd, "blockpcb") == 0)
   {
     BlockPCB(pcb_name);
   }
   else if (strcmp(cmd, "unblockpcb") == 0)
   {
     UnblockPCB(pcb_name);
-  }
+  }*/
   else if (strcmp(cmd, "suspendpcb") == 0)
   {
     SuspendPCB(pcb_name);
