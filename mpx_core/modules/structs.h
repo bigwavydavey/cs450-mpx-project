@@ -31,6 +31,9 @@ struct context
 	u32int eip, cs, eflags;
 };
 
+/**
+*	@brief This struct supports the alarm process
+*/
 struct alarm
 {
   char alarm_time[10];
@@ -39,6 +42,9 @@ struct alarm
   struct alarm *prev;
 };
 
+/**
+*	@brief This struct stores user created alarms
+*/
 struct alarm_list
 {
   int count;	
