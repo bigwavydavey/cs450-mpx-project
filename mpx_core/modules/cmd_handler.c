@@ -401,8 +401,11 @@ void cmd_handler()
       sys_req(READ, DEFAULT_DEVICE, shutdown_buffer, &shutdown_buffer_size);
 
       if (strcmp(shutdown_buffer, "y") == 0)
+      {
         //quit = 1; //exits cmd_handler
+        DeletePCB("idle");
         sys_req(EXIT, DEFAULT_DEVICE, NULL, NULL);
+      }
       else if (strcmp(shutdown_buffer, "n") == 0)
       {
         sys_req(WRITE, DEFAULT_DEVICE, "\nAborting shutdown...\n", &buffer_size);
@@ -461,8 +464,6 @@ void cmd_handler()
     }
     else if (strcmp(cmd_buffer, "loadr3") == 0)
       loadr3();
-    else if (strcmp(cmd_buffer, "yield") == 0)
-      yield();
     //Command not recognized
     else
     {
