@@ -6,6 +6,8 @@
 #include "pcb_temp_commands.h"
 #include "pcb_user_commands.h"
 #include "userR3Commands.h"
+#include "internal_procedures.h"
+#include "structs.h"
 
 int buffer_size = 99;
 /**
@@ -458,9 +460,27 @@ void cmd_handler()
     {
       ShowBlocked();  
     }
-  else if (strcmp(cmd_buffer, "showreadypcb") == 0)
+    else if (strcmp(cmd_buffer, "showreadypcb") == 0)
     {
       ShowReady();  
+    }
+    else if(strcmp(cmd_buffer, "inf") == 0)
+    {
+       struct pcb *inf_proc = SetupPCB("infinite", 0, 9);
+       RemovePCB(inf_proc);
+       inf_proc->state = 0;
+       InsertPCB(inf_proc);
+       struct context *inf_context = (struct context *)(inf_proc -> top);
+       memset(inf_context, 0, sizeof(struct context));
+       inf_context -> fs = 0x10;
+       inf_context -> gs = 0x10;
+       inf_context -> ds = 0x10;
+       inf_context -> es = 0x10;
+       inf_context -> cs = 0x8;
+       inf_context -> ebp = (u32int)(inf_proc-> stack);
+       inf_context -> esp = (u32int)(inf_proc -> top);
+       inf_context -> eip = (u32int)infinite_proc;
+       inf_context -> eflags = 0x202;
     }
     else if (strcmp(cmd_buffer, "loadr3") == 0)
       loadr3();

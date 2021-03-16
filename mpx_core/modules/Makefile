@@ -18,8 +18,7 @@ pcb_temp_commands.o\
 pcb_user_commands.o\
 sys_call.o\
 procsr3.o\
-userR3Commands.o\
-R4processes.o
+userR3Commands.o
 .c.s:
 	$(CC) $(CFLAGS) -S -o $@ $<
 .s.o:

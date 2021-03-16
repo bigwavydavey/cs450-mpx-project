@@ -68,5 +68,4 @@ void loadr3(){
 	cp_5 -> esp = (u32int)(new_pcb5 -> top);
 	cp_5 -> eip = (u32int)proc5;
 	cp_5 -> eflags = 0x202;
-	asm volatile ("int $60");
 }
