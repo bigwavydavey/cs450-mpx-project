@@ -74,7 +74,10 @@ void alarm_proc()
         input_sec = atoi(sec_s);
 	      if( hr > input_hr || ( hr == input_hr && min > input_min ) || ( hr == input_hr && min == input_min && sec >= input_sec ) )
 	      {
-		      sys_req(WRITE, DEFAULT_DEVICE, current->alarm_msg, &buffer);
+		      sys_req(WRITE, DEFAULT_DEVICE, "\n", &buffer);
+          sys_req(WRITE, DEFAULT_DEVICE, "ALARM: ", &buffer);
+          sys_req(WRITE, DEFAULT_DEVICE, current->alarm_msg, &buffer);
+          sys_req(WRITE, DEFAULT_DEVICE, "\n", &buffer);
           if (alarms.count == 1){
             alarms.tail = NULL;
             alarms.head = NULL;
