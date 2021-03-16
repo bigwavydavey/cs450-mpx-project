@@ -19,9 +19,7 @@ u32int* sys_call(struct context *registers )
       cop->top = (unsigned char*)registers;
     }
     else if( params.op_code == EXIT ){
-      //RemovePCB(cop);
       FreePCB(cop);
-      cop = ready_not_suspended.head;
     }
   }
 
@@ -34,5 +32,5 @@ u32int* sys_call(struct context *registers )
     return (u32int*)cop->top;
   }
   else
-    return (u32int*)cop->top;
+    return (u32int*)reference;
 }

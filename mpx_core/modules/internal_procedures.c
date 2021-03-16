@@ -236,9 +236,6 @@ void InsertPCB(struct pcb *PCB){
 void RemovePCB(struct pcb *PCB){
 	//remove from queue
 	//return success or error code
-	char * success = "\nRemoved successfully!\n\0";
-	int success_size = strlen(success);
-	int *success_len = &success_size;
 	char * failure = "\nERROR: The PCB could not be removed\n\0";
 	int failure_size = strlen(failure);
 	int *failure_len = &failure_size;
@@ -326,7 +323,6 @@ void RemovePCB(struct pcb *PCB){
 	}
 	toRemove->next = NULL;
 	toRemove->prev = NULL;
-	sys_req(WRITE, DEFAULT_DEVICE, success, success_len);
 }
 
 /**
