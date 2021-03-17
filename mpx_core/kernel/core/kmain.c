@@ -87,8 +87,8 @@ void kmain(void)
 
    // 6) Call YOUR command handler -  interface method
    klogv("Transferring control to commhand...");
-   //cmd_handler();
-   struct pcb *comhand = SetupPCB("comhand", 0, 9);
+   cmd_handler();
+   /*struct pcb *comhand = SetupPCB("comhand", 0, 9);
    RemovePCB(comhand);
    comhand->state = 0;
    InsertPCB(comhand);
@@ -103,7 +103,7 @@ void kmain(void)
    cp_1 -> esp = (u32int)(comhand -> top);
    cp_1 -> eip = (u32int)cmd_handler;
    cp_1 -> eflags = 0x202;
-   asm volatile ("int $60");
+   asm volatile ("int $60");*/
 
    // 7) System Shutdown on return from your command handler
    klogv("Starting system shutdown procedure...");
