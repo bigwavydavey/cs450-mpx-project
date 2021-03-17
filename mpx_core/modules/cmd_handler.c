@@ -401,7 +401,8 @@ void cmd_handler()
       sys_req(READ, DEFAULT_DEVICE, shutdown_buffer, &shutdown_buffer_size);
 
       if (strcmp(shutdown_buffer, "y") == 0)
-        quit = 1; //exits cmd_handler
+        //quit = 1; //exits cmd_handler
+        sys_req(EXIT, DEFAULT_DEVICE, NULL, NULL);
       else if (strcmp(shutdown_buffer, "n") == 0)
       {
         sys_req(WRITE, DEFAULT_DEVICE, "\nAborting shutdown...\n", &buffer_size);

@@ -23,6 +23,10 @@
 
 #include "modules/mpx_supt.h"
 #include "modules/cmd_handler.h"
+#include "modules/structs.h"
+#include "modules/internal_procedures.h"
+#include "modules/pcb_user_commands.h"
+
 
 
 void kmain(void)
@@ -83,7 +87,23 @@ void kmain(void)
 
    // 6) Call YOUR command handler -  interface method
    klogv("Transferring control to commhand...");
-   cmd_handler();
+   //cmd_handler();
+   struct pcb *comhand = SetupPCB("comhand", 0, 9);
+   RemovePCB(comhand);
+   comhand->state = 0;
+   InsertPCB(comhand);
+   struct context *cp_1 = (struct context *)(comhand -> top);
+   memset(cp_1, 0, sizeof(struct context));
+   cp_1 -> fs = 0x10;
+   cp_1 -> gs = 0x10;
+   cp_1 -> ds = 0x10;
+   cp_1 -> es = 0x10;
+   cp_1 -> cs = 0x8;
+   cp_1 -> ebp = (u32int)(comhand -> stack);
+   cp_1 -> esp = (u32int)(comhand -> top);
+   cp_1 -> eip = (u32int)cmd_handler;
+   cp_1 -> eflags = 0x202;
+   asm volatile ("int $60");
 
    // 7) System Shutdown on return from your command handler
    klogv("Starting system shutdown procedure...");
