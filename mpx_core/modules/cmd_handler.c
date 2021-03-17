@@ -5,6 +5,7 @@
 #include "cmd_handler.h"
 #include "pcb_temp_commands.h"
 #include "pcb_user_commands.h"
+#include "userR3Commands.h"
 
 int buffer_size = 99;
 /**
@@ -457,6 +458,10 @@ void cmd_handler()
     {
       ShowReady();  
     }
+    else if (strcmp(cmd_buffer, "loadr3") == 0)
+      loadr3();
+    else if (strcmp(cmd_buffer, "yield") == 0)
+      yield();
     //Command not recognized
     else
     {

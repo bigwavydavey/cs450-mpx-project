@@ -1,5 +1,5 @@
-#include <include/system.h>
-#include <include/core/serial.h>
+#include <system.h>
+#include <core/serial.h>
 
 #include "mpx_supt.h"
 #include "procsr3.h"
