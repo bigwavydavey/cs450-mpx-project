@@ -349,7 +349,7 @@ struct pcb * SetupPCB(char * processName, int class, int priority){
 
 	pcb_point->class = class;
 	pcb_point->priority = priority;
-	pcb_point->state = 0;
+	pcb_point->state = 1;
 	pcb_point->top = pcb_point->base + 1024 - sizeof(struct context);
 	InsertPCB(pcb_point);
 	return pcb_point;

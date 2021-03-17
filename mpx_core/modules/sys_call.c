@@ -1,5 +1,4 @@
 #include "mpx_supt.h"
-#include "mpx_supt.c"
 #include "structs.h"
 #include "internal_procedures.h"
 
@@ -14,12 +13,16 @@ u32int* sys_call(struct context *registers )
   }
   else
   {
+    extern param params;
     if( params.op_code == IDLE )
     {
       cop->top = (unsigned char*)registers;
     }
-    else if( params.op_code == EXIT )
+    else if( params.op_code == EXIT ){
+      //RemovePCB(cop);
       FreePCB(cop);
+      cop = ready_not_suspended.head;
+    }
   }
 
   if( ready_not_suspended.head != NULL )
