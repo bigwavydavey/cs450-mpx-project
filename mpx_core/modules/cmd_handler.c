@@ -407,7 +407,7 @@ void cmd_handler()
       if (strcmp(shutdown_buffer, "y") == 0)
       {
         //quit = 1; //exits cmd_handler
-        DeletePCB("idle");
+        RemovePCB(FindPCB("idle"));
         sys_req(EXIT, DEFAULT_DEVICE, NULL, NULL);
       }
       else if (strcmp(shutdown_buffer, "n") == 0)
