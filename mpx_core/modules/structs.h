@@ -31,4 +31,16 @@ struct context
 	u32int eip, cs, eflags;
 };
 
+struct alarm
+{
+  char* alarm_time;
+  char* alarm_msg;
+};
+
+struct alarm_list
+{
+  struct alarm current;
+  struct alarm next;
+};
+
 #endif

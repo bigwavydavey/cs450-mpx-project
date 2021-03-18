@@ -8,6 +8,7 @@
 #include "userR3Commands.h"
 #include "internal_procedures.h"
 #include "structs.h"
+#include "R4processes.h"
 
 int buffer_size = 99;
 /**
@@ -288,7 +289,7 @@ void optional_cmd_handler(char * cmd_buffer)
   {
     char * pcb_priority_s = strtok(NULL, " ");
     int pcb_priority = atoi(pcb_priority_s);
-    
+
     SetPCBPriority(pcb_name, pcb_priority);
   }
   else if (strcmp(cmd, "showpcb") == 0)
@@ -420,7 +421,7 @@ void cmd_handler()
 
     //Help command
     else if (strcmp(cmd_buffer, "help") == 0)
-    { 
+    {
       help();
     }
     else if (strcmp(cmd_buffer, "settime") == 0)
@@ -456,15 +457,15 @@ void cmd_handler()
     }
     else if (strcmp(cmd_buffer, "showpcbs") == 0)
     {
-      ShowAll(); 
+      ShowAll();
     }
     else if (strcmp(cmd_buffer, "showblkpcb") == 0)
     {
-      ShowBlocked();  
+      ShowBlocked();
     }
     else if (strcmp(cmd_buffer, "showreadypcb") == 0)
     {
-      ShowReady();  
+      ShowReady();
     }
     else if(strcmp(cmd_buffer, "inf") == 0)
     {
@@ -486,6 +487,18 @@ void cmd_handler()
     }
     else if (strcmp(cmd_buffer, "loadr3") == 0)
       loadr3();
+    else if (strcmp(cmd_buffer, "alarm") == 0)
+    {
+      sys_req(WRITE, DEFAULT_DEVICE, "Please enter time in HH:MM:SS format\n", &buffer_size);
+      char alarm_time[10];
+      memset(alarm_time, '\0', 10);
+
+      sys_req(WRITE, DEFAULT_DEVICE, "Please enter message\n", &buffer_size);
+      char alarm_msg[50];
+      memset(alarm_msg, '\0', 50);
+
+      add_alarm( alarm_time, alarm_msg );
+    }
     //Command not recognized
     else
     {
