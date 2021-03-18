@@ -5,6 +5,13 @@
 struct pcb* cop;
 struct context *reference;
 
+/**
+* @brief Prepares the system for the next ready process to begin/resume execution
+*
+* @param registers: A indirect memory operand pointing to the top of the stack
+*
+* @retval u32int*: Returns a new stack pointer
+*/
 u32int* sys_call(struct context *registers )
 {
   if( cop == NULL )
