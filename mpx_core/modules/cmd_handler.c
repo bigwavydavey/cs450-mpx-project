@@ -269,12 +269,7 @@ void optional_cmd_handler(char * cmd_buffer)
   {
     DeletePCB(pcb_name);
   }
-<<<<<<< HEAD
-  /*
-  else if (strcmp(cmd, "blockpcb") == 0)
-=======
   /*else if (strcmp(cmd, "blockpcb") == 0)
->>>>>>> r4
   {
     BlockPCB(pcb_name);
   }
@@ -338,28 +333,22 @@ void help()
   sys_req(WRITE, DEFAULT_DEVICE, "\ndeletepcb [pcb_name]: This command will delete a selected pcb from all 4 of the PCB queues, removing them completely from the system.\n", &buffer_size);
   //sys_req(WRITE, DEFAULT_DEVICE, "\nblockpcb [pcb_name]: This command will set the selected PCB’s state to blocked and insert it into the appropriate PCB queue. pcb_name must be a valid PCB already in existence. \n", &buffer_size);
   //sys_req(WRITE, DEFAULT_DEVICE, "\nunblockpcb [pcb_name]: This command will set the selected PCB’s state to unblocked and insert it in to theappropriate PCB queue. pcb_name must be valid. \n", &buffer_size);
-<<<<<<< HEAD
   sys_req(WRITE, DEFAULT_DEVICE, "\nsuspendpcb [pcb_name]: This command will set the selected PCB’s state to suspended and insert it in tothe appropriate PCB queue.\n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, "\nresumepcb [pcb_name]: This command will set the selected PCB’s state to unsuspended and insert it in tothe appropriate PCB queue.\n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, "\nsetpriority [pcb_name]: This command will set the selected PCB’s priority to a new user desired priority,\npossibly changing its location withing the queues.\n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, "\nshowpcb [pcb_name]: This command will display the attributes of a selected PCB in the terminal.\n\n", &buffer_size);
-=======
   sys_req(WRITE, DEFAULT_DEVICE, "\nsuspendpcb [pcb_name]: This command will set the selected PCB’s state to suspended and insert it in to the appropriate PCB queue.\n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, "\nresumepcb [pcb_name]: This command will set the selected PCB’s state to unsuspended and insert it in to the appropriate PCB queue.\n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, "\nsetpriority [pcb_name]: This command will set the selected PCB’s priority to a new user desired priority,\npossibly changing its location withing the queues.\n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, "\nshowpcb [pcb_name]: This command will display the attributes of a selected PCB in the terminal.\n", &buffer_size);
->>>>>>> r4
   sys_req(WRITE, DEFAULT_DEVICE, "\nshowreadypcb: This command will display all processes contained within the two ready queues in the terminal.\n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, "\nshowreadypcb: This command will display all processes contained within the two ready queues in the terminal.\n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, "\nshowblkpcb: This command will display all processes contained within the two blocked queues in the terminal.\n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, "\nshowpcbs: This commands will display all existing processes, in all four queues, in the terminal.\n", &buffer_size);
-<<<<<<< HEAD
-  sys_req(WRITE, DEFAULT_DEVICE, "\nyield: This command forces the command handler to let other processes execute.\n", &buffer_size);
+  //sys_req(WRITE, DEFAULT_DEVICE, "\nyield: This command forces the command handler to let other processes execute.\n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, "\nloadr3: This command loads 5 processes into memory to test R3.\n", &buffer_size);
-=======
   sys_req(WRITE, DEFAULT_DEVICE, "\nloadr3: Loads test processes for R3\n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, "\ninf: Loads the infinite process and adds it to ready queue.\n", &buffer_size);
->>>>>>> r4
 }
 /**
 
@@ -409,11 +398,7 @@ void cmd_handler()
     //Version command
     if (strcmp(cmd_buffer, "version") == 0) // see if buffer matches version command
     {
-<<<<<<< HEAD
-      char * current_version = "\nOS Allstars' MPX Version 3.0, last updated March 18, 2021\n";
-=======
       char * current_version = "\nOS Allstars' MPX Version 4.0, last updated March 18, 2021\n";
->>>>>>> r4
       sys_req(WRITE, DEFAULT_DEVICE, current_version, &buffer_size);
     }
     //Shutdown command
