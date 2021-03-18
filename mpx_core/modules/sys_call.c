@@ -17,6 +17,7 @@ u32int* sys_call(struct context *registers )
     if( params.op_code == IDLE )
     {
       cop->top = (unsigned char*)registers;
+      cop->state = 0;
       InsertPCB(cop);
     }
     else if( params.op_code == EXIT ){
@@ -28,6 +29,7 @@ u32int* sys_call(struct context *registers )
   {
     struct pcb* rdy_process = ready_not_suspended.head;
     RemovePCB(rdy_process);
+    rdy_process->state = 5;
     cop = rdy_process;
     return (u32int*)cop->top;
   }

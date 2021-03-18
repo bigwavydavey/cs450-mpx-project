@@ -188,7 +188,7 @@ void idle()
 /**
   @brief This process initiates a identical
          process to idle(), but is not a system
-         process, and can be delted if it has 
+         process, and can be deleted if it has 
          already been suspended. 
   @param None
   @retval None
@@ -196,10 +196,13 @@ void idle()
 void infinite_proc()
 {
   int quit = 1;
-  char * idle_msg = "\nInfinite process has been dispatched.\n";
-  int idle_msg_size = 34;
+  int idle_msg_size = 40;
+  char idle_msg[idle_msg_size];
+  memset( idle_msg, '\0', idle_msg_size);
+  strcpy(idle_msg, "\nInfinite process has been dispatched.\n");
+
   
-  while (!quit)
+  while (quit)
   {
     sys_req(WRITE, DEFAULT_DEVICE, idle_msg, &idle_msg_size);
     sys_req(IDLE, DEFAULT_DEVICE, NULL, NULL);

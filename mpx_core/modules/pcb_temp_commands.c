@@ -35,8 +35,8 @@ void DeletePCB(char *processName){
 
 	if(strcmp(processName, "idle") == 0 || strcmp(processName, "comhand") == 0)
     	sys_req(WRITE, DEFAULT_DEVICE, "\nERROR:Cannot delete system processes\n", &buffer_size);
-	else if(strcmp(processName, "infinite") == 0 && pcb->state == 1){
-		sys_req(WRITE, DEFAULT_DEVICE, "\nERROR:Ifinite process must be suspended to delete\n", &buffer_size);
+	else if(strcmp(processName, "infinite") == 0 && (pcb->state != 1 && pcb->state != 3)){
+		sys_req(WRITE, DEFAULT_DEVICE, "\nERROR:Infinite process must be suspended to delete\n", &buffer_size);
 	}
 	else if( pcb != NULL ){
 		RemovePCB(pcb);

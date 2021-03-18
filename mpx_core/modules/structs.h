@@ -17,7 +17,7 @@ struct pcb
 	int priority;
 	// 0- ready not suspended, 1- ready suspended, 2- blocked non suspended, 3- blcoked suspended, 5- running
 	int state;
-	unsigned char stack[1024];
+	unsigned char stack[2048];
 	unsigned char *top;
 	unsigned char *base;
 	struct pcb *next;
@@ -33,14 +33,17 @@ struct context
 
 struct alarm
 {
-  char* alarm_time;
-  char* alarm_msg;
+  char alarm_time[10];
+  char alarm_msg[50];
+  struct alarm *next;
+  struct alarm *prev;
 };
 
 struct alarm_list
 {
-  struct alarm current;
-  struct alarm next;
+  int count;	
+  struct alarm *head;
+  struct alarm *tail;
 };
 
 #endif

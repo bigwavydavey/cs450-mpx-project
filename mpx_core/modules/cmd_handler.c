@@ -96,7 +96,7 @@ void gettime()
   strcat(time, ":");
   strcat(time, sec_s);
 
-  sys_req(WRITE, DEFAULT_DEVICE, "The time is: ", &buffer);
+  sys_req(WRITE, DEFAULT_DEVICE, "\nThe time is: ", &buffer);
   sys_req(WRITE, DEFAULT_DEVICE, time, &buffer);
 }
 
@@ -229,7 +229,7 @@ void getdate()
   strcat(date, year_mil_s);
   strcat(date, year_dec_s);
 
-  sys_req(WRITE, DEFAULT_DEVICE, "The date is: ", &buffer);
+  sys_req(WRITE, DEFAULT_DEVICE, "\nThe date is: ", &buffer);
   sys_req(WRITE, DEFAULT_DEVICE, date, &buffer);
 }
 
@@ -330,7 +330,7 @@ void help()
 
   //R2 commands
   //sys_req(WRITE, DEFAULT_DEVICE, "\ncreatepcb [pcb_name] [pcb_class] [pcb_priority]: This command will create a new PCB for the given attributes, pcb_name, pcb_priority, pcb_class.\n", &buffer_size);
-  sys_req(WRITE, DEFAULT_DEVICE, "\ndeleteocb [pcb_name]: This command will delete a selected pcb from all 4 of the PCB queues, removing them completely from the system.\n", &buffer_size);
+  sys_req(WRITE, DEFAULT_DEVICE, "\ndeletepcb [pcb_name]: This command will delete a selected pcb from all 4 of the PCB queues, removing them completely from the system.\n", &buffer_size);
   //sys_req(WRITE, DEFAULT_DEVICE, "\nblockpcb [pcb_name]: This command will set the selected PCB’s state to blocked and insert it into the appropriate PCB queue. pcb_name must be a valid PCB already in existence. \n", &buffer_size);
   //sys_req(WRITE, DEFAULT_DEVICE, "\nunblockpcb [pcb_name]: This command will set the selected PCB’s state to unblocked and insert it in to theappropriate PCB queue. pcb_name must be valid. \n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, "\nsuspendpcb [pcb_name]: This command will set the selected PCB’s state to suspended and insert it in to the appropriate PCB queue.\n", &buffer_size);
@@ -426,7 +426,7 @@ void cmd_handler()
     }
     else if (strcmp(cmd_buffer, "settime") == 0)
     {
-      sys_req(WRITE, DEFAULT_DEVICE, "Please enter time in HH:MM:SS format\n", &buffer_size);
+      sys_req(WRITE, DEFAULT_DEVICE, "\nPlease enter time in HH:MM:SS format\n", &buffer_size);
 
       char time_buffer[10];
       memset(time_buffer, '\0', 10);
@@ -469,10 +469,7 @@ void cmd_handler()
     }
     else if(strcmp(cmd_buffer, "inf") == 0)
     {
-       struct pcb *inf_proc = SetupPCB("infinite", 0, 9);
-       RemovePCB(inf_proc);
-       inf_proc->state = 0;
-       InsertPCB(inf_proc);
+       struct pcb *inf_proc = SetupPCB("infinite", 1, 9);
        struct context *inf_context = (struct context *)(inf_proc -> top);
        memset(inf_context, 0, sizeof(struct context));
        inf_context -> fs = 0x10;
@@ -484,18 +481,23 @@ void cmd_handler()
        inf_context -> esp = (u32int)(inf_proc -> top);
        inf_context -> eip = (u32int)infinite_proc;
        inf_context -> eflags = 0x202;
+       InsertPCB(inf_proc);
     }
     else if (strcmp(cmd_buffer, "loadr3") == 0)
       loadr3();
     else if (strcmp(cmd_buffer, "alarm") == 0)
     {
-      sys_req(WRITE, DEFAULT_DEVICE, "Please enter time in HH:MM:SS format\n", &buffer_size);
-      char alarm_time[10];
-      memset(alarm_time, '\0', 10);
+      sys_req(WRITE, DEFAULT_DEVICE, "\nPlease enter time in HH:MM:SS format\n", &buffer_size);
+      int alarm_time_size = 10;
+      char alarm_time[alarm_time_size];
+      memset(alarm_time, '\0', alarm_time_size);
+      sys_req(READ, DEFAULT_DEVICE, alarm_time, &alarm_time_size);
 
-      sys_req(WRITE, DEFAULT_DEVICE, "Please enter message\n", &buffer_size);
-      char alarm_msg[50];
-      memset(alarm_msg, '\0', 50);
+      sys_req(WRITE, DEFAULT_DEVICE, "\nPlease enter message\n", &buffer_size);
+      int alarm_msg_size = 50;
+      char alarm_msg[alarm_msg_size];
+      memset(alarm_msg, '\0', alarm_msg_size);
+      sys_req(READ, DEFAULT_DEVICE, alarm_msg, &alarm_msg_size);
 
       add_alarm( alarm_time, alarm_msg );
     }
