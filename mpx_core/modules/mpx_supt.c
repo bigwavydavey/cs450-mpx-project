@@ -164,11 +164,11 @@ int sys_free_mem(void *ptr)
 }
 
 /*
-  Procedure..: idle
-  Description..: The idle process, used in dispatching
-			it will only be dispatched if NO other
-			processes are available to execute.
-  Params..: None
+  @brief The idle process, used in dispatching
+			   it will only be dispatched if NO other
+			   processes are available to execute.
+  @param None
+  @retval None
 */
 void idle()
 {
@@ -176,11 +176,36 @@ void idle()
   int count=0;
 
 	memset( msg, '\0', sizeof(msg));
-	strcpy(msg, "IDLE PROCESS EXECUTING.\n");
+	strcpy(msg, "\nIDLE PROCESS EXECUTING.\n");
 	count = strlen(msg);
 
   while(1){
 	sys_req( WRITE, DEFAULT_DEVICE, msg, &count);
     sys_req(IDLE, DEFAULT_DEVICE, NULL, NULL);
   }
+}
+
+/**
+  @brief This process initiates a identical
+         process to idle(), but is not a system
+         process, and can be deleted if it has 
+         already been suspended. 
+  @param None
+  @retval None
+*/
+void infinite_proc()
+{
+  int quit = 1;
+  int idle_msg_size = 40;
+  char idle_msg[idle_msg_size];
+  memset( idle_msg, '\0', idle_msg_size);
+  strcpy(idle_msg, "\nInfinite process has been dispatched.\n");
+
+  
+  while (quit)
+  {
+    sys_req(WRITE, DEFAULT_DEVICE, idle_msg, &idle_msg_size);
+    sys_req(IDLE, DEFAULT_DEVICE, NULL, NULL);
+  }
+
 }

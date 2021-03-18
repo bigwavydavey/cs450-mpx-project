@@ -1,6 +1,7 @@
 #include "mpx_supt.h"
 #include "structs.h"
 #include <string.h>
+#include <core/serial.h>
 
 struct queue ready_suspended;
 struct queue ready_not_suspended;
@@ -15,18 +16,14 @@ struct queue blocked_not_suspended;
 *
 */
 struct pcb * AllocatePCB(){
-	int stack_size = 1024;
+	int stack_size = 2048;
 	struct pcb *PCB;
 	PCB = sys_alloc_mem(sizeof(struct pcb));
 	PCB->base = PCB->stack;
-	PCB->top = PCB->base + stack_size;
-	int loop_control = 0;
-	while (loop_control < stack_size){
-		PCB->stack[loop_control] = '\0';
-		loop_control++;
-	}
+	PCB->top = PCB->base + stack_size - sizeof(struct context);
+	memset(PCB->stack, 0, stack_size);
 	return PCB;
-	return NULL;
+	//return NULL;
 }
 
 /**
@@ -206,7 +203,7 @@ void InsertPCB(struct pcb *PCB){
 		blocked_not_suspended.count++;
 
 	}
-	else{
+	else if (PCB->state == 3){
 		//blocked_suspended
 		if (blocked_suspended.count == 0)
 		{
@@ -338,15 +335,12 @@ void RemovePCB(struct pcb *PCB){
 */
 struct pcb * SetupPCB(char * processName, int class, int priority){
 	struct pcb *pcb_point;
-	struct pcb PCB;
-	pcb_point = &PCB;
 	pcb_point = AllocatePCB();
 	strcpy(pcb_point->name, processName);
 
 	pcb_point->class = class;
 	pcb_point->priority = priority;
-	pcb_point->state = 1;
-	pcb_point->top = pcb_point->base + 1024 - sizeof(struct context);
-	InsertPCB(pcb_point);
+	pcb_point->state = 0;
+	//InsertPCB(pcb_point);
 	return pcb_point;
 }

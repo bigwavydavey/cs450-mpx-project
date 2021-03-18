@@ -24,6 +24,8 @@ void SuspendPCB(char *processName){
   struct pcb *pcb = FindPCB(processName);
   if(pcb == NULL)
     sys_req(WRITE, DEFAULT_DEVICE, "\nERROR:The pcb you entered does not exist\n", &buffer_length);
+  else if(strcmp(processName, "idle") == 0 || strcmp(processName, "comhand") == 0 || strcmp(processName, "alarm") == 0)
+    sys_req(WRITE, DEFAULT_DEVICE, "\nERROR:Cannot suspend system processes\n", &buffer_length);
   else
   {
     if( pcb->state == 0 )
@@ -62,6 +64,8 @@ void ResumePCB(char *processName){
 
   if(pcb == NULL)
     sys_req(WRITE, DEFAULT_DEVICE, "\nERROR:The pcb you entered does not exist\n", &buffer_length);
+  else if(strcmp(processName, "idle") == 0 || strcmp(processName, "comhand") == 0)
+    sys_req(WRITE, DEFAULT_DEVICE, "\nERROR:Cannot resume system processes\n", &buffer_length);
   else
   {
     if( pcb->state == 1 )
@@ -97,6 +101,8 @@ void SetPCBPriority(char *processName, int priority){
   struct pcb *pcb = FindPCB(processName);
   if(pcb == NULL)
     sys_req(WRITE, DEFAULT_DEVICE, "\nERROR:The pcb you entered does not exist\n", &buffer_length);
+  else if(strcmp(processName, "idle") == 0 || strcmp(processName, "comhand") == 0)
+    sys_req(WRITE, DEFAULT_DEVICE, "\nERROR:Cannot edit system processes\n", &buffer_length);
   else
   {
     if (priority < 0 || priority > 9)

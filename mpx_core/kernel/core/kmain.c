@@ -26,6 +26,7 @@
 #include "modules/structs.h"
 #include "modules/internal_procedures.h"
 #include "modules/pcb_user_commands.h"
+#include "modules/R4processes.h"
 
 
 
@@ -50,7 +51,11 @@ void kmain(void)
    // 1) Initialize the support software by identifying the current
    //     MPX Module.  This will change with each module.
    // you will need to call mpx_init from the mpx_supt.c
+<<<<<<< HEAD
    mpx_init(MODULE_R3);
+=======
+   mpx_init(MODULE_R4);
+>>>>>>> r4
 
    // 2) Check that the boot was successful and correct when using grub
    // Comment this when booting the kernel directly using QEMU, etc.
@@ -87,11 +92,9 @@ void kmain(void)
 
    // 6) Call YOUR command handler -  interface method
    klogv("Transferring control to commhand...");
-   cmd_handler();
-   /*struct pcb *comhand = SetupPCB("comhand", 0, 9);
-   RemovePCB(comhand);
-   comhand->state = 0;
-   InsertPCB(comhand);
+   //cmd_handler();
+
+   struct pcb *comhand = SetupPCB("comhand", 0, 9);
    struct context *cp_1 = (struct context *)(comhand -> top);
    memset(cp_1, 0, sizeof(struct context));
    cp_1 -> fs = 0x10;
@@ -103,7 +106,36 @@ void kmain(void)
    cp_1 -> esp = (u32int)(comhand -> top);
    cp_1 -> eip = (u32int)cmd_handler;
    cp_1 -> eflags = 0x202;
-   asm volatile ("int $60");*/
+   InsertPCB(comhand);
+
+   struct pcb *alarm = SetupPCB("alarm", 1, 9);
+   struct context *alarm_context = (struct context *)(alarm -> top);
+   memset(alarm_context, 0, sizeof(struct context));
+   alarm_context -> fs = 0x10;
+   alarm_context -> gs = 0x10;
+   alarm_context -> ds = 0x10;
+   alarm_context -> es = 0x10;
+   alarm_context -> cs = 0x8;
+   alarm_context -> ebp = (u32int)(alarm -> stack);
+   alarm_context -> esp = (u32int)(alarm -> top);
+   alarm_context -> eip = (u32int)alarm_proc;
+   alarm_context -> eflags = 0x202;
+   InsertPCB(alarm);
+
+   struct pcb *idle_p = SetupPCB("idle", 0, 9);
+   struct context *idle_context = (struct context *)(idle_p -> top);
+   memset(idle_context, 0, sizeof(struct context));
+   idle_context -> fs = 0x10;
+   idle_context -> gs = 0x10;
+   idle_context -> ds = 0x10;
+   idle_context -> es = 0x10;
+   idle_context -> cs = 0x8;
+   idle_context -> ebp = (u32int)(idle_p -> stack);
+   idle_context -> esp = (u32int)(idle_p -> top);
+   idle_context -> eip = (u32int)idle;
+   idle_context -> eflags = 0x202;
+   InsertPCB(idle_p);
+   asm volatile ("int $60");
 
    // 7) System Shutdown on return from your command handler
    klogv("Starting system shutdown procedure...");

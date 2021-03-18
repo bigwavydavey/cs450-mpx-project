@@ -6,6 +6,9 @@
 #include "pcb_temp_commands.h"
 #include "pcb_user_commands.h"
 #include "userR3Commands.h"
+#include "internal_procedures.h"
+#include "structs.h"
+#include "R4processes.h"
 
 int buffer_size = 99;
 /**
@@ -93,7 +96,7 @@ void gettime()
   strcat(time, ":");
   strcat(time, sec_s);
 
-  sys_req(WRITE, DEFAULT_DEVICE, "The time is: ", &buffer);
+  sys_req(WRITE, DEFAULT_DEVICE, "\nThe time is: ", &buffer);
   sys_req(WRITE, DEFAULT_DEVICE, time, &buffer);
 }
 
@@ -226,7 +229,7 @@ void getdate()
   strcat(date, year_mil_s);
   strcat(date, year_dec_s);
 
-  sys_req(WRITE, DEFAULT_DEVICE, "The date is: ", &buffer);
+  sys_req(WRITE, DEFAULT_DEVICE, "\nThe date is: ", &buffer);
   sys_req(WRITE, DEFAULT_DEVICE, date, &buffer);
 }
 
@@ -266,8 +269,12 @@ void optional_cmd_handler(char * cmd_buffer)
   {
     DeletePCB(pcb_name);
   }
+<<<<<<< HEAD
   /*
   else if (strcmp(cmd, "blockpcb") == 0)
+=======
+  /*else if (strcmp(cmd, "blockpcb") == 0)
+>>>>>>> r4
   {
     BlockPCB(pcb_name);
   }
@@ -287,7 +294,7 @@ void optional_cmd_handler(char * cmd_buffer)
   {
     char * pcb_priority_s = strtok(NULL, " ");
     int pcb_priority = atoi(pcb_priority_s);
-    
+
     SetPCBPriority(pcb_name, pcb_priority);
   }
   else if (strcmp(cmd, "showpcb") == 0)
@@ -331,16 +338,28 @@ void help()
   sys_req(WRITE, DEFAULT_DEVICE, "\ndeletepcb [pcb_name]: This command will delete a selected pcb from all 4 of the PCB queues, removing them completely from the system.\n", &buffer_size);
   //sys_req(WRITE, DEFAULT_DEVICE, "\nblockpcb [pcb_name]: This command will set the selected PCB’s state to blocked and insert it into the appropriate PCB queue. pcb_name must be a valid PCB already in existence. \n", &buffer_size);
   //sys_req(WRITE, DEFAULT_DEVICE, "\nunblockpcb [pcb_name]: This command will set the selected PCB’s state to unblocked and insert it in to theappropriate PCB queue. pcb_name must be valid. \n", &buffer_size);
+<<<<<<< HEAD
   sys_req(WRITE, DEFAULT_DEVICE, "\nsuspendpcb [pcb_name]: This command will set the selected PCB’s state to suspended and insert it in tothe appropriate PCB queue.\n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, "\nresumepcb [pcb_name]: This command will set the selected PCB’s state to unsuspended and insert it in tothe appropriate PCB queue.\n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, "\nsetpriority [pcb_name]: This command will set the selected PCB’s priority to a new user desired priority,\npossibly changing its location withing the queues.\n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, "\nshowpcb [pcb_name]: This command will display the attributes of a selected PCB in the terminal.\n\n", &buffer_size);
+=======
+  sys_req(WRITE, DEFAULT_DEVICE, "\nsuspendpcb [pcb_name]: This command will set the selected PCB’s state to suspended and insert it in to the appropriate PCB queue.\n", &buffer_size);
+  sys_req(WRITE, DEFAULT_DEVICE, "\nresumepcb [pcb_name]: This command will set the selected PCB’s state to unsuspended and insert it in to the appropriate PCB queue.\n", &buffer_size);
+  sys_req(WRITE, DEFAULT_DEVICE, "\nsetpriority [pcb_name]: This command will set the selected PCB’s priority to a new user desired priority,\npossibly changing its location withing the queues.\n", &buffer_size);
+  sys_req(WRITE, DEFAULT_DEVICE, "\nshowpcb [pcb_name]: This command will display the attributes of a selected PCB in the terminal.\n", &buffer_size);
+>>>>>>> r4
   sys_req(WRITE, DEFAULT_DEVICE, "\nshowreadypcb: This command will display all processes contained within the two ready queues in the terminal.\n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, "\nshowreadypcb: This command will display all processes contained within the two ready queues in the terminal.\n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, "\nshowblkpcb: This command will display all processes contained within the two blocked queues in the terminal.\n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, "\nshowpcbs: This commands will display all existing processes, in all four queues, in the terminal.\n", &buffer_size);
+<<<<<<< HEAD
   sys_req(WRITE, DEFAULT_DEVICE, "\nyield: This command forces the command handler to let other processes execute.\n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, "\nloadr3: This command loads 5 processes into memory to test R3.\n", &buffer_size);
+=======
+  sys_req(WRITE, DEFAULT_DEVICE, "\nloadr3: Loads test processes for R3\n", &buffer_size);
+  sys_req(WRITE, DEFAULT_DEVICE, "\ninf: Loads the infinite process and adds it to ready queue.\n", &buffer_size);
+>>>>>>> r4
 }
 /**
 
@@ -390,7 +409,11 @@ void cmd_handler()
     //Version command
     if (strcmp(cmd_buffer, "version") == 0) // see if buffer matches version command
     {
+<<<<<<< HEAD
       char * current_version = "\nOS Allstars' MPX Version 3.0, last updated March 18, 2021\n";
+=======
+      char * current_version = "\nOS Allstars' MPX Version 4.0, last updated March 18, 2021\n";
+>>>>>>> r4
       sys_req(WRITE, DEFAULT_DEVICE, current_version, &buffer_size);
     }
     //Shutdown command
@@ -404,8 +427,14 @@ void cmd_handler()
       sys_req(READ, DEFAULT_DEVICE, shutdown_buffer, &shutdown_buffer_size);
 
       if (strcmp(shutdown_buffer, "y") == 0)
-        quit = 1; //exits cmd_handler
-        //sys_req(EXIT, DEFAULT_DEVICE, NULL, NULL);
+      {
+        //quit = 1; //exits cmd_handler
+        RemovePCB(FindPCB("idle"));
+        RemovePCB(FindPCB("alarm"));
+        if (FindPCB("infinite") != NULL)
+          RemovePCB(FindPCB("infinite"));
+        sys_req(EXIT, DEFAULT_DEVICE, NULL, NULL);
+      }
       else if (strcmp(shutdown_buffer, "n") == 0)
       {
         sys_req(WRITE, DEFAULT_DEVICE, "\nAborting shutdown...\n", &buffer_size);
@@ -416,12 +445,12 @@ void cmd_handler()
 
     //Help command
     else if (strcmp(cmd_buffer, "help") == 0)
-    { 
+    {
       help();
     }
     else if (strcmp(cmd_buffer, "settime") == 0)
     {
-      sys_req(WRITE, DEFAULT_DEVICE, "Please enter time in HH:MM:SS format\n", &buffer_size);
+      sys_req(WRITE, DEFAULT_DEVICE, "\nPlease enter time in HH:MM:SS format\n", &buffer_size);
 
       char time_buffer[10];
       memset(time_buffer, '\0', 10);
@@ -452,24 +481,55 @@ void cmd_handler()
     }
     else if (strcmp(cmd_buffer, "showpcbs") == 0)
     {
-      ShowAll(); 
+      ShowAll();
     }
     else if (strcmp(cmd_buffer, "showblkpcb") == 0)
     {
-      ShowBlocked();  
+      ShowBlocked();
     }
-  else if (strcmp(cmd_buffer, "showreadypcb") == 0)
+    else if (strcmp(cmd_buffer, "showreadypcb") == 0)
     {
-      ShowReady();  
+      ShowReady();
+    }
+    else if(strcmp(cmd_buffer, "inf") == 0)
+    {
+       struct pcb *inf_proc = SetupPCB("infinite", 1, 9);
+       struct context *inf_context = (struct context *)(inf_proc -> top);
+       memset(inf_context, 0, sizeof(struct context));
+       inf_context -> fs = 0x10;
+       inf_context -> gs = 0x10;
+       inf_context -> ds = 0x10;
+       inf_context -> es = 0x10;
+       inf_context -> cs = 0x8;
+       inf_context -> ebp = (u32int)(inf_proc-> stack);
+       inf_context -> esp = (u32int)(inf_proc -> top);
+       inf_context -> eip = (u32int)infinite_proc;
+       inf_context -> eflags = 0x202;
+       InsertPCB(inf_proc);
     }
     else if (strcmp(cmd_buffer, "loadr3") == 0)
       loadr3();
-    else if (strcmp(cmd_buffer, "yield") == 0)
-      yield();
+    else if (strcmp(cmd_buffer, "alarm") == 0)
+    {
+      sys_req(WRITE, DEFAULT_DEVICE, "\nPlease enter time in HH:MM:SS format\n", &buffer_size);
+      int alarm_time_size = 10;
+      char alarm_time[alarm_time_size];
+      memset(alarm_time, '\0', alarm_time_size);
+      sys_req(READ, DEFAULT_DEVICE, alarm_time, &alarm_time_size);
+
+      sys_req(WRITE, DEFAULT_DEVICE, "\nPlease enter message\n", &buffer_size);
+      int alarm_msg_size = 50;
+      char alarm_msg[alarm_msg_size];
+      memset(alarm_msg, '\0', alarm_msg_size);
+      sys_req(READ, DEFAULT_DEVICE, alarm_msg, &alarm_msg_size);
+
+      add_alarm( alarm_time, alarm_msg );
+    }
     //Command not recognized
     else
     {
       optional_cmd_handler(cmd_buffer);
     }
+  sys_req(IDLE, DEFAULT_DEVICE, NULL, NULL);
   }
 }
