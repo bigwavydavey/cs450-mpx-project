@@ -391,7 +391,7 @@ void cmd_handler()
     //Version command
     if (strcmp(cmd_buffer, "version") == 0) // see if buffer matches version command
     {
-      char * current_version = "\nOS Allstars' MPX Version 2.0, last updated Feb 26, 2021\n";
+      char * current_version = "\nOS Allstars' MPX Version 3.0, last updated March 18, 2021\n";
       sys_req(WRITE, DEFAULT_DEVICE, current_version, &buffer_size);
     }
     //Shutdown command

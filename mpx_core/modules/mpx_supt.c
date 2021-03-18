@@ -164,11 +164,11 @@ int sys_free_mem(void *ptr)
 }
 
 /*
-  Procedure..: idle
-  Description..: The idle process, used in dispatching
-			it will only be dispatched if NO other
-			processes are available to execute.
-  Params..: None
+  @brief The idle process, used in dispatching
+			   it will only be dispatched if NO other
+			   processes are available to execute.
+  @param None
+  @retval None
 */
 void idle()
 {
@@ -185,6 +185,14 @@ void idle()
   }
 }
 
+/**
+  @brief This process initiates a identical
+         process to idle(), but is not a system
+         process, and can be delted if it has 
+         already been suspended. 
+  @param None
+  @retval None
+*/
 void infinite_proc()
 {
   int quit = 1;
