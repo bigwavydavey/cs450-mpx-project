@@ -4,10 +4,19 @@
 #include "internal_procedures.h"
 #include "pcb_user_commands.h"
 #include <string.h>
+
+/**
+* @brief This function will trigger the interupt 60 and casue the command handler to yield to other processes
+*
+*/
 void yield(){
 	asm volatile ("int $60");
 }
 
+/**
+* @brief This function will create and insert all r3 processes into the suspended ready queue
+*
+*/
 void loadr3(){
 	struct pcb *new_pcb1 = SetupPCB("proc1", 1, 9);
 	new_pcb1->state = 1;
