@@ -23,6 +23,15 @@ struct alarm_list alarms;
 
 }*/
 
+/**
+*  @brief This function add an alarm into a list for the system to keep track of
+*         and display a message at the specified time
+*
+*  @param alarm_time: the time the user specifies the alarm to go off
+*  @param alarm_msg: message that the user specifies that will be displayed at the alarm
+*
+*  @retval none
+*/
 void add_alarm( char* alarm_time, char* alarm_msg )
 {
   struct alarm *al;
@@ -41,6 +50,14 @@ void add_alarm( char* alarm_time, char* alarm_msg )
   alarms.count++;
 }
 
+/**
+*  @brief This function has the functionality for the alarm,
+*         will display and exit the process when the alarm time comes
+*
+*  @param none
+*
+*  @retval none
+*/
 void alarm_proc()
 {
   char alarm_time_copy[10];
