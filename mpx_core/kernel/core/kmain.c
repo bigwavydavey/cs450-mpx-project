@@ -104,7 +104,7 @@ void kmain(void)
    cp_1 -> eflags = 0x202;
    InsertPCB(comhand);
 
-   struct pcb *alarm = SetupPCB("alarm", 1, 9);
+   struct pcb *alarm = SetupPCB("alarm", 1, 1);
    struct context *alarm_context = (struct context *)(alarm -> top);
    memset(alarm_context, 0, sizeof(struct context));
    alarm_context -> fs = 0x10;
@@ -118,7 +118,7 @@ void kmain(void)
    alarm_context -> eflags = 0x202;
    InsertPCB(alarm);
 
-   struct pcb *idle_p = SetupPCB("idle", 0, 9);
+   struct pcb *idle_p = SetupPCB("idle", 0, 0);
    struct context *idle_context = (struct context *)(idle_p -> top);
    memset(idle_context, 0, sizeof(struct context));
    idle_context -> fs = 0x10;

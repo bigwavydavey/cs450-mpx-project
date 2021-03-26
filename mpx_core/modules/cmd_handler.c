@@ -349,6 +349,7 @@ void help()
   sys_req(WRITE, DEFAULT_DEVICE, "\nloadr3: This command loads 5 processes into memory to test R3.\n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, "\nloadr3: Loads test processes for R3\n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, "\ninf: Loads the infinite process and adds it to ready queue.\n", &buffer_size);
+  sys_req(WRITE, DEFAULT_DEVICE, "\nalarm: Creates an alarm process that will display a custom message at a time you will be asked to specify.\n", &buffer_size);
 }
 /**
 
@@ -478,7 +479,7 @@ void cmd_handler()
     }
     else if(strcmp(cmd_buffer, "inf") == 0)
     {
-       struct pcb *inf_proc = SetupPCB("infinite", 1, 9);
+       struct pcb *inf_proc = SetupPCB("infinite", 1, 0);
        struct context *inf_context = (struct context *)(inf_proc -> top);
        memset(inf_context, 0, sizeof(struct context));
        inf_context -> fs = 0x10;

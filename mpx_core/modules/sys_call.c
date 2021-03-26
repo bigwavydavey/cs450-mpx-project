@@ -14,6 +14,7 @@ struct context *reference;
 */
 u32int* sys_call(struct context *registers )
 {
+  struct pcb* temp = NULL;
   if( cop == NULL )
   {
     reference = registers;
@@ -25,7 +26,8 @@ u32int* sys_call(struct context *registers )
     {
       cop->top = (unsigned char*)registers;
       cop->state = 0;
-      InsertPCB(cop);
+      temp = cop;
+      //InsertPCB(cop);
     }
     else if( params.op_code == EXIT ){
       FreePCB(cop);
@@ -37,6 +39,8 @@ u32int* sys_call(struct context *registers )
     struct pcb* rdy_process = ready_not_suspended.head;
     RemovePCB(rdy_process);
     rdy_process->state = 5;
+    if(temp != NULL)
+      InsertPCB(temp);
     cop = rdy_process;
     return (u32int*)cop->top;
   }

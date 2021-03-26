@@ -10,7 +10,7 @@
 
 struct alarm_list alarms;
 
-void infinite_proc();
+//void infinite_proc();
 
 void add_alarm( char* alarm_time, char* alarm_msg );
 
