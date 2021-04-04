@@ -347,7 +347,7 @@ struct pcb * SetupPCB(char * processName, int class, int priority){
 void InitializeHeap(u32int size){
 	heapsize = size + sizeof(struct cmcb) + sizeof(struct lmcb);
 	heap_address = kmalloc(heapsize);
-	struct cmcb start_cmcb = {.beginning_address = heap_address, .type = 1, .size = heapsize};
+	struct cmcb start_cmcb = {.beginning_address = heap_address, .type = 1, .size = heapsize, .pcb_name = "free"};
 	struct cmcb *start_cmcb_ptr = &start_cmcb;
 	free.head = start_cmcb_ptr;
 	free.tail = start_cmcb_ptr;
@@ -362,7 +362,7 @@ void AllocateMem(u32int size){
 		if (free_mcbs->size >= allocate_size){
 			free_mcbs->size = free_mcbs->size - allocate_size - allocated.count * (sizeof(struct cmcb) + sizeof(struct lmcb));
 			new_address = free_mcbs->beginning_address;
-			free_mcbs->beginning_address = free_mcbs->beginning_address + allocate_size;
+			free_mcbs->beginning_address = new_address + allocate_size;
 			struct cmcb cmcb = {.beginning_address = new_address, .type = 0, .size = allocate_size};
 			struct cmcb *cmcb_ptr = &cmcb;
 			if (allocated.count == 0){
@@ -396,6 +396,85 @@ void AllocateMem(u32int size){
 			break;
 		}
 		free_mcbs = free_mcbs->next;
+	}
+}
+
+void FreeMem(u32int address){
+	
+	if (address == heap_address){
+		if (allocated.count == 1){
+			allocated.head = NULL;
+			allocated.tail = NULL;
+			free.head->beginning_address = address;
+			free.head->size = heapsize;
+		}
+		else{
+			struct cmcb *freed_mem = allocated.head;
+			//allocated.head->type = 1;
+			allocated.head = freed_mem->next;
+			freed_mem->next = NULL;
+			allocated.head->prev = NULL;
+			if (free.head->beginning_address == (heap_address + freed_mem->size)){
+				free.head->beginning_address = address;
+				free.head->size += freed_mem->size;
+			}
+			else{
+				freed_mem->type = 1;
+				strcpy(freed_mem->pcb_name, "free");
+				free.head->prev = freed_mem;
+				freed_mem->next = free.head;
+				free.head = freed_mem;
+			}
+		}
+	}
+	else if (address == allocated.tail->beginning_address){
+		struct cmcb *tail_mcb = allocated.tail;
+		allocated.tail = tail_mcb->prev;
+		tail_mcb->prev = NULL;
+		allocated.tail->next = NULL;
+		if (free.tail->beginning_address == (address - tail_mcb->size)){
+			free.tail->size += tail_mcb->size;
+		}
+		else if (free.tail->beginning_address == (address + tail_mcb->size)){
+			free.tail->beginning_address = address;
+			free.tail->size += tail_mcb->size;
+		}
+		else{
+			tail_mcb->type = 1;
+			strcpy(tail_mcb->pcb_name, "free");
+			tail_mcb->prev = free.tail;
+			free.tail->next = tail_mcb;
+			free.tail = tail_mcb;
+		}
+	}
+	struct cmcb *alloc_mcbs = allocated.head;
+	while (alloc_mcbs != NULL){
+		if (alloc_mcbs->beginning_address == address){
+			struct cmcb *selected = alloc_mcbs;
+			selected->prev->next = selected->next;
+			selected->next->prev = selected->prev;
+			struct cmcb *free_mcbs = free.head;
+			while (address >= free_mcbs->beginning_address){
+				free_mcbs = free_mcbs->next;
+			}
+			if (free_mcbs->beginning_address == (address - selected->size)){
+				free_mcbs->size += selected->size;
+			}
+			else if (free_mcbs->beginning_address == (address + selected->size)){
+				free_mcbs->beginning_address = address;
+				free_mcbs->size += selected->size;
+			}
+			else{
+				selected->type = 1;
+				strcpy(selected->pcb_name, "free");
+				free_mcbs->prev->next = selected;
+				selected->prev = free_mcbs->prev;
+				free_mcbs->prev = selected;
+				selected->next = free_mcbs;
+			}
+			break;
+		}
+		alloc_mcbs = alloc_mcbs->next;
 	}
 }
 
