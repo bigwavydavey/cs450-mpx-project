@@ -10,6 +10,13 @@ struct queue
   struct pcb *tail;
 };
 
+struct mcb_queue
+{
+	int count;
+	struct cmcb *head;
+	struct cmcb *tail;
+};
+
 struct pcb
 {
 	char name[10];
@@ -51,5 +58,27 @@ struct alarm_list
   struct alarm *head;
   struct alarm *tail;
 };
+
+struct cmcb
+{
+	//0 Allocated, 1 Free
+	int type;
+	u32int beginning_address;
+	int size;
+	char pcb_name[10];
+	struct cmcb *next;
+	struct cmcb *prev;
+};
+
+struct lmcb
+{
+	int type;
+	int size;
+};
+
+struct queue ready_suspended;
+struct queue ready_not_suspended;
+struct queue blocked_suspended;
+struct queue blocked_not_suspended;
 
 #endif

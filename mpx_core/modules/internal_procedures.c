@@ -1,12 +1,14 @@
 #include "mpx_supt.h"
 #include "structs.h"
 #include <string.h>
+#include <mem/heap.h>
 #include <core/serial.h>
 
-struct queue ready_suspended;
-struct queue ready_not_suspended;
-struct queue blocked_suspended;
-struct queue blocked_not_suspended;
+
+u32int heap_address;
+struct mcb_queue free;
+struct mcb_queue allocated;
+u32int heapsize;
 
 /**
 * This function is used to allocate memory for a pcb
@@ -23,7 +25,6 @@ struct pcb * AllocatePCB(){
 	PCB->top = PCB->base + stack_size - sizeof(struct context);
 	memset(PCB->stack, 0, stack_size);
 	return PCB;
-	//return NULL;
 }
 
 /**
@@ -324,7 +325,7 @@ void RemovePCB(struct pcb *PCB){
 
 /**
 * This function is used to place a pcb in the memory that has been allocated for it
-* as well as neccessary initialization. Inserts into ready not suspened queue
+* as well as neccessary initialization.
 *
 * @param  processName: a charcter pointer to what the user would like the pcb to be called
 * @param  class: an integer indicating whether the pcb is an application or system process
@@ -337,10 +338,72 @@ struct pcb * SetupPCB(char * processName, int class, int priority){
 	struct pcb *pcb_point;
 	pcb_point = AllocatePCB();
 	strcpy(pcb_point->name, processName);
-
 	pcb_point->class = class;
 	pcb_point->priority = priority;
 	pcb_point->state = 0;
-	//InsertPCB(pcb_point);
 	return pcb_point;
+}
+
+void InitializeHeap(u32int size){
+	heapsize = size + sizeof(struct cmcb) + sizeof(struct lmcb);
+	heap_address = kmalloc(heapsize);
+	struct cmcb start_cmcb = {.beginning_address = heap_address, .type = 1, .size = heapsize};
+	struct cmcb *start_cmcb_ptr = &start_cmcb;
+	free.head = start_cmcb_ptr;
+	free.tail = start_cmcb_ptr;
+	free.count = 1;
+}
+
+void AllocateMem(u32int size){
+	int allocate_size = size + sizeof(struct cmcb) + sizeof(struct lmcb);
+	u32int new_address;
+	struct cmcb* free_mcbs = free.head;
+	while (free_mcbs != NULL){
+		if (free_mcbs->size >= allocate_size){
+			free_mcbs->size = free_mcbs->size - allocate_size - allocated.count * (sizeof(struct cmcb) + sizeof(struct lmcb));
+			new_address = free_mcbs->beginning_address;
+			free_mcbs->beginning_address = free_mcbs->beginning_address + allocate_size;
+			struct cmcb cmcb = {.beginning_address = new_address, .type = 0, .size = allocate_size};
+			struct cmcb *cmcb_ptr = &cmcb;
+			if (allocated.count == 0){
+				allocated.head = cmcb_ptr;
+				allocated.tail = cmcb_ptr;
+				allocated.count++;
+			}
+			else{
+				if (cmcb_ptr->beginning_address < allocated.head->beginning_address){
+					cmcb_ptr->next = allocated.head;
+					allocated.head->prev = cmcb_ptr;
+					allocated.head = cmcb_ptr;
+				}
+				else if (cmcb_ptr->beginning_address > allocated.tail->beginning_address){
+					cmcb_ptr->prev = allocated.tail;
+					allocated.tail->next = cmcb_ptr;
+					allocated.tail = cmcb_ptr;
+				}
+				else{
+					struct cmcb *allocated_curr = allocated.head->next;
+					while (allocated_curr != NULL){
+						if (cmcb_ptr->beginning_address < allocated_curr->beginning_address){
+							cmcb_ptr->prev = allocated_curr->prev;
+							allocated_curr->prev->next = cmcb_ptr;
+							cmcb_ptr->next = allocated_curr;
+							allocated_curr->prev = cmcb_ptr;
+						}
+					}
+				}
+			}
+			break;
+		}
+		free_mcbs = free_mcbs->next;
+	}
+}
+
+int isEmpty(){
+	if (allocated.head == NULL){
+		return 1;
+	}
+	else{
+		return 0;
+	}
 }

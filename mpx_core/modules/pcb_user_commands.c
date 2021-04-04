@@ -15,12 +15,7 @@ char input[1];
   @retval none
 */
 void SuspendPCB(char *processName){
-	/*
-		check name
-		FindPCB(processName);
-		if 4 queues, remove from non-suspeneded and
-		insert into suspended
-	*/
+
   struct pcb *pcb = FindPCB(processName);
   if(pcb == NULL)
     sys_req(WRITE, DEFAULT_DEVICE, "\nERROR:The pcb you entered does not exist\n", &buffer_length);
@@ -54,12 +49,7 @@ void SuspendPCB(char *processName){
   @retval none
 */
 void ResumePCB(char *processName){
-	/*
-		check name
-		FindPCB(processName);
-		if 4 queues, remove from suspeneded and
-		insert into non-suspended
-	*/
+
   struct pcb *pcb = FindPCB(processName);
 
   if(pcb == NULL)
@@ -93,11 +83,7 @@ void ResumePCB(char *processName){
   @retval none
 */
 void SetPCBPriority(char *processName, int priority){
-	/*
-		check name and priority
-		struct PCB *pcb = FindPCB(*processName);
-		pcb.priority = priority;
-	*/
+
   struct pcb *pcb = FindPCB(processName);
   if(pcb == NULL)
     sys_req(WRITE, DEFAULT_DEVICE, "\nERROR:The pcb you entered does not exist\n", &buffer_length);
@@ -123,12 +109,7 @@ void SetPCBPriority(char *processName, int priority){
 */
 void ShowPCB(char *processName)
 {
-	/*
-		check name
-		FindPCB(processName);
-		buffer = "Process Name: processName | State: state | Suspended Status: status | Priority: priority\n";
-		sys_req(WRITE, DEFAULT_DEVICE, buffer, buffer.len());
-	*/
+
   struct pcb *display_pcb = FindPCB(processName);
 
   if (display_pcb->name == NULL)
@@ -174,12 +155,7 @@ void ShowPCB(char *processName)
   @retval none
 */
 void ShowReady(){
-	/*
-		struct PCB pcb = ReadyQueueHead
-		sys_req(WRITE, DEFAULT_DEVICE, "Ready:\n", count);
-		while pcb.next != NULL
-		ShowPCB(pcb.processName);
-	*/
+
   sys_req(WRITE, DEFAULT_DEVICE, "\nReady:\n", &buffer_length);
   struct pcb *pcb;
   if(ready_suspended.head == NULL && ready_not_suspended.head == NULL)
@@ -224,13 +200,7 @@ void ShowReady(){
   @retval none
 */
 void ShowBlocked(){
-	/*
-		struct PCB pcb = BlockedQueueHead
-		sys_req(WRITE, DEFAULT_DEVICE, "Blocked:\n", count);
-		while pcb.next != NUll
-		ShowPCB(pcb.processName);
-	*/
-  struct pcb *pcb = blocked_suspended.head;
+  struct pcb *pcb;
   sys_req(WRITE, DEFAULT_DEVICE, "\nBlocked:\n", &buffer_length);
 
   if(blocked_suspended.head == NULL && blocked_not_suspended.head == NULL)
