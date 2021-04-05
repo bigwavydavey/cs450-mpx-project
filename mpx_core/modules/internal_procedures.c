@@ -6,8 +6,8 @@
 
 
 u32int heap_address;
-struct mcb_queue free;
-struct mcb_queue allocated;
+struct lmcb_queue free;
+struct cmcb_queue allocated;
 u32int heapsize;
 
 /**
@@ -485,4 +485,60 @@ int isEmpty(){
 	else{
 		return 0;
 	}
+}
+
+void showLMCB(){
+	 struct lmcb *cur = free.head;
+	 char * addr;
+	 char * size;
+	 char * msg= "Limited MCB:\n";
+	 char * type_msg = "Type: ";
+	 char * size_msg = "Size: ";
+	 int type_msg_size = strlen(type_msg);
+	 int msg_size = strlen(msg);
+	 int new_line = 1;
+
+	 while(cur != NULL)
+	 {
+	 	sys_req(WRITE, DEFAULT_DEVICE, msg, &msg_size);
+	 	itoa(cur->type, addr, 10);
+	 	itoa(cur->size, size, 10);
+	 	int addr_size = strlen(addr);
+	 	int size_size = strlen(size);
+	 	sys_req(WRITE, DEFAULT_DEVICE, type_msg, &type_msg_size);
+	 	sys_req(WRITE, DEFAULT_DEVICE, addr, &addr_size);
+	 	sys_req(WRITE, DEFAULT_DEVICE, "\n", &new_line);
+	 	sys_req(WRITE, DEFAULT_DEVICE, size_msg, &type_msg_size);
+	 	sys_req(WRITE, DEFAULT_DEVICE, size, &size_size);
+
+	 	cur = cur->next;
+	 }
+}
+
+void showCMCB(){
+	 struct cmcb *cur = allocated.head;
+	 char * addr;
+	 char * size;
+	 char * msg= "Complete MCB:\n";
+	 char * type_msg = "Address: ";
+	 char * size_msg = "Size: ";
+	 int type_msg_size = strlen(type_msg);
+	 int msg_size = strlen(msg);
+	 int new_line = 1;
+
+	 while(cur != NULL)
+	 {
+	 	sys_req(WRITE, DEFAULT_DEVICE, msg, &msg_size);
+	 	itoa(cur->type, addr, 10);
+	 	itoa(cur->size, size, 10);
+	 	int addr_size = strlen(addr);
+	 	int size_size = strlen(size);
+	 	sys_req(WRITE, DEFAULT_DEVICE, type_msg, &type_msg_size);
+	 	sys_req(WRITE, DEFAULT_DEVICE, addr, &addr_size);
+	 	sys_req(WRITE, DEFAULT_DEVICE, "\n", &new_line);
+	 	sys_req(WRITE, DEFAULT_DEVICE, size_msg, &type_msg_size);
+	 	sys_req(WRITE, DEFAULT_DEVICE, size, &size_size);
+
+	 	cur = cur->next;
+	 }
 }

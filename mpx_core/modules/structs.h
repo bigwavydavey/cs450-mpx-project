@@ -10,11 +10,18 @@ struct queue
   struct pcb *tail;
 };
 
-struct mcb_queue
+struct cmcb_queue
 {
 	int count;
 	struct cmcb *head;
 	struct cmcb *tail;
+};
+
+struct lmcb_queue
+{
+	int count;
+	struct lmcb *head;
+	struct lmcb *tail;
 };
 
 struct pcb
@@ -74,6 +81,8 @@ struct lmcb
 {
 	int type;
 	int size;
+	struct lmcb *next;
+	struct lmcb *prev;
 };
 
 struct queue ready_suspended;

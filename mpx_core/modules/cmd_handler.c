@@ -296,6 +296,16 @@ void optional_cmd_handler(char * cmd_buffer)
   {
     ShowPCB(pcb_name);
   }
+  else if(strcmp(cmd_buffer, "alloc") == 0)
+  {
+    int bytes = atoi(pcb_name);
+    AllocateMem((u32int) bytes); 
+  }
+  else if(strcmp(cmd_buffer, "free") == 0)
+  {
+    int addr = atoi(pcb_name);
+    FreeMem((u32int) addr);  
+  }
   //Command not recognized
   else
   {
@@ -511,6 +521,27 @@ void cmd_handler()
 
       add_alarm( alarm_time, alarm_msg );
     }
+    else if(strcmp(cmd_buffer, "initheap") == 0)
+      InitializeHeap((u32int)1000);
+    else if(strcmp(cmd_buffer, "isempty") == 0)
+    {
+      if (isEmpty() == 1)
+      {
+        char * empty_msg = "The allocated list is empty.";
+        int empty_msg_size = strlen(empty_msg);
+        sys_req(WRITE, DEFAULT_DEVICE, empty_msg, &empty_msg_size);
+      }
+      else
+      {
+        char * not_empty_msg = "The allocated list contains blocks.";
+        int not_empty_msg_size = strlen(not_empty_msg);
+        sys_req(WRITE, DEFAULT_DEVICE, not_empty_msg, &not_empty_msg_size);
+      }
+    }
+    else if(strcmp(cmd_buffer, "showfreemem") == 0)
+      showLMCB();
+    else if(strcmp(cmd_buffer, "showallocmem") == 0)
+      showCMCB();
     //Command not recognized
     else
     {
