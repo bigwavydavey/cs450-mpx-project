@@ -19,7 +19,7 @@ void InitializeHeap(u32int size);
 void AllocateMem(u32int address);
 void FreeMem();
 int isEmpty();
-void showLMCB();
-void showCMCB();
+void showFree();
+void showAllocated();
 
 #endif
