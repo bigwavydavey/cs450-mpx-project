@@ -501,7 +501,7 @@ void showFree(){
 	struct cmcb *cur = free.head;
 	char addr[10] = "";
 	char size[5] = "";
-	char msg[20]= "\nComplete MCB:\n";
+	char msg[20]= "\nFree Blocks:\n";
 	char size_msg[10] = "Size: \0";
 	char address[10] = "Address: \0";
 	int address_size = strlen(address);
@@ -530,7 +530,7 @@ void showAllocated(){
 	struct cmcb *cur = allocated.head;
 	char addr[10] = "";
 	char size[5] = "";
-	char msg[20]= "\nComplete MCB:\n";
+	char msg[20]= "\nAllocated Blocks:\n";
 	char size_msg[10] = "Size: \0";
 	char address[10] = "Address: \0";
 	int address_size = strlen(address);

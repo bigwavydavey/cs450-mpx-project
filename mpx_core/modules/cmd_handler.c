@@ -296,14 +296,13 @@ void optional_cmd_handler(char * cmd_buffer)
   {
     ShowPCB(pcb_name);
   }
-  else if(strcmp(cmd_buffer, "alloc") == 0)
+  else if(strcmp(cmd_buffer, "malloc") == 0)
   {
-    //int bytes = atoi(pcb_name);
-    AllocateMem(100); 
+    int bytes = atoi(pcb_name);
+    AllocateMem(bytes); 
   }
   else if(strcmp(cmd_buffer, "free") == 0)
   {
-    //int addr = atoi(pcb_name);
     FreeMem(heap_address + sizeof(struct cmcb));  
   }
   //Command not recognized
@@ -538,10 +537,10 @@ void cmd_handler()
         sys_req(WRITE, DEFAULT_DEVICE, not_empty_msg, &not_empty_msg_size);
       }
     }
-    else if(strcmp(cmd_buffer, "showfreemem") == 0){
+    else if(strcmp(cmd_buffer, "showfree") == 0){
       showFree();
     }
-    else if(strcmp(cmd_buffer, "showallocmem") == 0)
+    else if(strcmp(cmd_buffer, "showmalloc") == 0)
       showAllocated();
     //Command not recognized
     else
