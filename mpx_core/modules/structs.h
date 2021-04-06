@@ -72,7 +72,6 @@ struct cmcb
 	int type;
 	u32int beginning_address;
 	int size;
-	char pcb_name[10];
 	struct cmcb *next;
 	struct cmcb *prev;
 };
@@ -81,13 +80,12 @@ struct lmcb
 {
 	int type;
 	int size;
-	struct lmcb *next;
-	struct lmcb *prev;
 };
 
 struct queue ready_suspended;
 struct queue ready_not_suspended;
 struct queue blocked_suspended;
 struct queue blocked_not_suspended;
+u32int heap_address;
 
 #endif

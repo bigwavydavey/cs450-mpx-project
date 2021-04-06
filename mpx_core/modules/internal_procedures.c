@@ -5,7 +5,6 @@
 #include <core/serial.h>
 
 
-u32int heap_address;
 struct cmcb_queue free;
 struct cmcb_queue allocated;
 u32int heapsize;
@@ -347,8 +346,13 @@ struct pcb * SetupPCB(char * processName, int class, int priority){
 void InitializeHeap(u32int size){
 	heapsize = size + sizeof(struct cmcb) + sizeof(struct lmcb);
 	heap_address = kmalloc(heapsize);
-	struct cmcb start_cmcb = {.beginning_address = heap_address, .type = 1, .size = heapsize, .pcb_name = "free", .next = NULL, .prev = NULL};
-	struct cmcb *start_cmcb_ptr = &start_cmcb;
+	//struct cmcb start_cmcb = {.beginning_address = heap_address + sizeof(struct cmcb), .type = 1, .size = size, .pcb_name = "free", .next = NULL, .prev = NULL};
+	struct cmcb *start_cmcb_ptr = (struct cmcb *)heap_address;
+	start_cmcb_ptr->beginning_address = heap_address + sizeof(struct cmcb);
+	start_cmcb_ptr->type = 1;
+	start_cmcb_ptr->size = size;
+	start_cmcb_ptr->next = NULL;
+	start_cmcb_ptr->prev = NULL;
 	free.head = start_cmcb_ptr;
 	free.tail = start_cmcb_ptr;
 	free.count = 1;
@@ -363,32 +367,40 @@ void AllocateMem(u32int size){
 			free_mcbs->size = free_mcbs->size - allocate_size - allocated.count * (sizeof(struct cmcb) + sizeof(struct lmcb));
 			new_address = free_mcbs->beginning_address;
 			free_mcbs->beginning_address = new_address + allocate_size;
-			struct cmcb cmcb = {.beginning_address = new_address, .type = 0, .size = allocate_size};
-			struct cmcb *cmcb_ptr = &cmcb;
+			//struct cmcb cmcb = {.beginning_address = new_address, .type = 0, .size = allocate_size};
+			struct cmcb *cmcb= (struct cmcb*) new_address;
+			cmcb->beginning_address = new_address + sizeof(struct cmcb);
+			cmcb->type = 0;
+			cmcb->size = size;
+			cmcb->next = NULL;
+			cmcb->prev = NULL;
 			if (allocated.count == 0){
-				allocated.head = cmcb_ptr;
-				allocated.tail = cmcb_ptr;
+				allocated.head = cmcb;
+				allocated.tail = cmcb;
 				allocated.count++;
 			}
 			else{
-				if (cmcb_ptr->beginning_address < allocated.head->beginning_address){
-					cmcb_ptr->next = allocated.head;
-					allocated.head->prev = cmcb_ptr;
-					allocated.head = cmcb_ptr;
+				if (cmcb->beginning_address < allocated.head->beginning_address){
+					cmcb->next = allocated.head;
+					allocated.head->prev = cmcb;
+					allocated.head = cmcb;
+					allocated.count++;
 				}
-				else if (cmcb_ptr->beginning_address > allocated.tail->beginning_address){
-					cmcb_ptr->prev = allocated.tail;
-					allocated.tail->next = cmcb_ptr;
-					allocated.tail = cmcb_ptr;
+				else if (cmcb->beginning_address > allocated.tail->beginning_address){
+					cmcb->prev = allocated.tail;
+					allocated.tail->next = cmcb;
+					allocated.tail = cmcb;
+					allocated.count++;
 				}
 				else{
 					struct cmcb *allocated_curr = allocated.head->next;
 					while (allocated_curr != NULL){
-						if (cmcb_ptr->beginning_address < allocated_curr->beginning_address){
-							cmcb_ptr->prev = allocated_curr->prev;
-							allocated_curr->prev->next = cmcb_ptr;
-							cmcb_ptr->next = allocated_curr;
-							allocated_curr->prev = cmcb_ptr;
+						if (cmcb->beginning_address < allocated_curr->beginning_address){
+							cmcb->prev = allocated_curr->prev;
+							allocated_curr->prev->next = cmcb;
+							cmcb->next = allocated_curr;
+							allocated_curr->prev = cmcb;
+							allocated.count++;
 						}
 					}
 				}
@@ -401,12 +413,13 @@ void AllocateMem(u32int size){
 
 void FreeMem(u32int address){
 	
-	if (address == heap_address){
+	if (address == heap_address + sizeof(struct cmcb)){
 		if (allocated.count == 1){
+			serial_println("hello");
 			allocated.head = NULL;
 			allocated.tail = NULL;
 			free.head->beginning_address = address;
-			free.head->size = heapsize;
+			free.head->size = heapsize - sizeof(struct cmcb) - sizeof(struct lmcb);
 		}
 		else{
 			struct cmcb *freed_mem = allocated.head;
@@ -420,7 +433,6 @@ void FreeMem(u32int address){
 			}
 			else{
 				freed_mem->type = 1;
-				strcpy(freed_mem->pcb_name, "free");
 				free.head->prev = freed_mem;
 				freed_mem->next = free.head;
 				free.head = freed_mem;
@@ -441,7 +453,6 @@ void FreeMem(u32int address){
 		}
 		else{
 			tail_mcb->type = 1;
-			strcpy(tail_mcb->pcb_name, "free");
 			tail_mcb->prev = free.tail;
 			free.tail->next = tail_mcb;
 			free.tail = tail_mcb;
@@ -466,7 +477,6 @@ void FreeMem(u32int address){
 			}
 			else{
 				selected->type = 1;
-				strcpy(selected->pcb_name, "free");
 				free_mcbs->prev->next = selected;
 				selected->prev = free_mcbs->prev;
 				free_mcbs->prev = selected;
@@ -488,61 +498,59 @@ int isEmpty(){
 }
 
 void showFree(){
-	 struct cmcb *cur = free.head;
-	 char * addr = "";
-	 char * size = "";
-	 char * msg= "Limited MCB:\n";
-	 char * type_msg = "Type: ";
-	 char * size_msg = "Size: ";
-	 int type_msg_size = strlen(type_msg);
-	 int msg_size = strlen(msg);
-	 int new_line = 1;
+	struct cmcb *cur = free.head;
+	char addr[10] = "";
+	char size[5] = "";
+	char msg[20]= "\nComplete MCB:\n";
+	char size_msg[10] = "Size: \0";
+	char address[10] = "Address: \0";
+	int address_size = strlen(address);
+	int size_msg_size = strlen(size);
+	int msg_size = strlen(msg);
+	int new_line = 1;
 
-	 while(cur != NULL)
-	 {
-	 	sys_req(WRITE, DEFAULT_DEVICE, msg, &msg_size);
-	 	sys_req(WRITE, DEFAULT_DEVICE, type_msg, &type_msg_size);
-	 	itoa(cur->type, addr, 10);
-	 	int addr_size = strlen(addr);
-	 	sys_req(WRITE, DEFAULT_DEVICE, addr, &addr_size);
-	 	sys_req(WRITE, DEFAULT_DEVICE, size_msg, &type_msg_size);
-	 	itoa(cur->size, size, 10);
-	 	int size_size = strlen(size);
-	 	sys_req(WRITE, DEFAULT_DEVICE, size, &size_size);
-	 	sys_req(WRITE, DEFAULT_DEVICE, "\n", &new_line);
+	while(cur != NULL)
+	{
+		sys_req(WRITE, DEFAULT_DEVICE, msg, &msg_size);
+		sys_req(WRITE, DEFAULT_DEVICE, size_msg, &size_msg_size);
+		itoa(cur->size, size, 10);
+		int size_size = strlen(size);
+		sys_req(WRITE, DEFAULT_DEVICE, size, &size_size);
+		sys_req(WRITE, DEFAULT_DEVICE, "\n", &new_line);
+		itoa((int)cur->beginning_address, addr, 10);
+		int addr_size = strlen(addr);
+		sys_req(WRITE, DEFAULT_DEVICE, address, &address_size);
+		sys_req(WRITE, DEFAULT_DEVICE, addr, &addr_size);
 
-	 	cur = cur->next;
-	 }
+		cur = cur->next;
+	}
 }
 
 void showAllocated(){
-	 struct cmcb *cur = allocated.head;
-	 char * count = "";
-	 itoa(allocated.count, count, 10);
-	 serial_println(count);
+	struct cmcb *cur = allocated.head;
+	char addr[10] = "";
+	char size[5] = "";
+	char msg[20]= "\nComplete MCB:\n";
+	char size_msg[10] = "Size: \0";
+	char address[10] = "Address: \0";
+	int address_size = strlen(address);
+	int size_msg_size = strlen(size);
+	int msg_size = strlen(msg);
+	int new_line = 1;
 
-	 char * addr = "";
-	 char * size = "";
-	 char * msg= "Limited MCB:\n";
-	 char * type_msg = "Type: ";
-	 char * size_msg = "Size: ";
-	 int type_msg_size = strlen(type_msg);
-	 int msg_size = strlen(msg);
-	 int new_line = 1;
+	while(cur != NULL)
+	{
+		sys_req(WRITE, DEFAULT_DEVICE, msg, &msg_size);
+		sys_req(WRITE, DEFAULT_DEVICE, size_msg, &size_msg_size);
+		itoa(cur->size, size, 10);
+		int size_size = strlen(size);
+		sys_req(WRITE, DEFAULT_DEVICE, size, &size_size);
+		sys_req(WRITE, DEFAULT_DEVICE, "\n", &new_line);
+		itoa((int)cur->beginning_address, addr, 10);
+		int addr_size = strlen(addr);
+		sys_req(WRITE, DEFAULT_DEVICE, address, &address_size);
+		sys_req(WRITE, DEFAULT_DEVICE, addr, &addr_size);
 
-	 while(cur != NULL)
-	 {
-	 	itoa(cur->type, addr, 10);
-	 	itoa(cur->size, size, 10);
-	 	int addr_size = strlen(addr);
-	 	int size_size = strlen(size);
-	 	sys_req(WRITE, DEFAULT_DEVICE, msg, &msg_size);
-	 	sys_req(WRITE, DEFAULT_DEVICE, type_msg, &type_msg_size);
-	 	sys_req(WRITE, DEFAULT_DEVICE, addr, &addr_size);
-	 	sys_req(WRITE, DEFAULT_DEVICE, "\n", &new_line);
-	 	sys_req(WRITE, DEFAULT_DEVICE, size_msg, &type_msg_size);
-	 	sys_req(WRITE, DEFAULT_DEVICE, size, &size_size);
-
-	 	cur = cur->next;
-	 }
+		cur = cur->next;
+	}
 }
