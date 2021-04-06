@@ -303,7 +303,8 @@ void optional_cmd_handler(char * cmd_buffer)
   }
   else if(strcmp(cmd_buffer, "free") == 0)
   {
-    FreeMem(heap_address + sizeof(struct cmcb));  
+    u32int address = (u32int)(atoi(pcb_name));
+    FreeMem(address);  
   }
   //Command not recognized
   else
