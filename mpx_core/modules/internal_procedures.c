@@ -363,13 +363,30 @@ void AllocateMem(u32int size){
 	u32int new_address;
 	struct cmcb* free_mcbs = free.head;
 	while (free_mcbs != NULL){
-		if (free_mcbs->size >= allocate_size){
-			free_mcbs->size = free_mcbs->size - allocate_size - allocated.count * (sizeof(struct cmcb) + sizeof(struct lmcb));
+		if (free_mcbs->size == (int)size){
 			new_address = free_mcbs->beginning_address;
-			free_mcbs->beginning_address = new_address + allocate_size;
-			//struct cmcb cmcb = {.beginning_address = new_address, .type = 0, .size = allocate_size};
-			struct cmcb *cmcb= (struct cmcb*) new_address;
-			cmcb->beginning_address = new_address + sizeof(struct cmcb);
+			if (free_mcbs == free.head && free_mcbs == free.tail){
+				free.head = NULL;
+				free.tail = NULL;
+			}
+			else if (free_mcbs == free.head){
+				free.head = free.head->next;
+				free.head->prev = NULL;
+				free_mcbs->next = NULL;
+			}
+			else if (free_mcbs == free.tail){
+				free.tail = free.tail->prev;
+				free.tail->next = NULL;
+				free_mcbs->prev = NULL;
+			}
+			else{
+				free_mcbs->next->prev = free_mcbs->prev;
+				free_mcbs->prev->next = free_mcbs->next;
+				free_mcbs->next = NULL;
+				free_mcbs->prev = NULL;
+			}
+			struct cmcb *cmcb = (struct cmcb*)new_address;
+			cmcb->beginning_address = new_address;
 			cmcb->type = 0;
 			cmcb->size = size;
 			cmcb->next = NULL;
@@ -384,12 +401,73 @@ void AllocateMem(u32int size){
 					cmcb->next = allocated.head;
 					allocated.head->prev = cmcb;
 					allocated.head = cmcb;
+
+					if (allocated.count == 1){
+						allocated.tail->prev = allocated.head;
+					}
+
 					allocated.count++;
 				}
 				else if (cmcb->beginning_address > allocated.tail->beginning_address){
 					cmcb->prev = allocated.tail;
 					allocated.tail->next = cmcb;
 					allocated.tail = cmcb;
+
+					if (allocated.count == 1){
+						allocated.head->next = allocated.tail;
+					}
+					allocated.count++;
+				}
+				else{
+					struct cmcb *allocated_curr = allocated.head->next;
+					while (allocated_curr != NULL){
+						if (cmcb->beginning_address < allocated_curr->beginning_address){
+							cmcb->prev = allocated_curr->prev;
+							allocated_curr->prev->next = cmcb;
+							cmcb->next = allocated_curr;
+							allocated_curr->prev = cmcb;
+							allocated.count++;
+						}
+					}
+				}
+			}
+
+		}
+		else if (free_mcbs->size > (int)size){
+			free_mcbs->size = free_mcbs->size - allocate_size - allocated.count * (sizeof(struct cmcb) + sizeof(struct lmcb));
+			new_address = free_mcbs->beginning_address;
+			free_mcbs->beginning_address = new_address + allocate_size;
+			struct cmcb *cmcb= (struct cmcb*) new_address;
+			cmcb->beginning_address = new_address;
+			cmcb->type = 0;
+			cmcb->size = size;
+			cmcb->next = NULL;
+			cmcb->prev = NULL;
+			if (allocated.count == 0){
+				allocated.head = cmcb;
+				allocated.tail = cmcb;
+				allocated.count++;
+			}
+			else{
+				if (cmcb->beginning_address < allocated.head->beginning_address){
+					cmcb->next = allocated.head;
+					allocated.head->prev = cmcb;
+					allocated.head = cmcb;
+
+					if (allocated.count == 1){
+						allocated.tail->prev = allocated.head;
+					}
+
+					allocated.count++;
+				}
+				else if (cmcb->beginning_address > allocated.tail->beginning_address){
+					cmcb->prev = allocated.tail;
+					allocated.tail->next = cmcb;
+					allocated.tail = cmcb;
+
+					if (allocated.count == 1){
+						allocated.head->next = allocated.tail;
+					}
 					allocated.count++;
 				}
 				else{
@@ -412,77 +490,83 @@ void AllocateMem(u32int size){
 }
 
 void FreeMem(u32int address){
-	
-	if (address == heap_address + sizeof(struct cmcb)){
-		if (allocated.count == 1){
-			serial_println("hello");
-			allocated.head = NULL;
-			allocated.tail = NULL;
-			free.head->beginning_address = address;
-			free.head->size = heapsize - sizeof(struct cmcb) - sizeof(struct lmcb);
-		}
-		else{
-			struct cmcb *freed_mem = allocated.head;
-			//allocated.head->type = 1;
-			allocated.head = freed_mem->next;
-			freed_mem->next = NULL;
-			allocated.head->prev = NULL;
-			if (free.head->beginning_address == (heap_address + freed_mem->size)){
-				free.head->beginning_address = address;
-				free.head->size += freed_mem->size;
-			}
-			else{
-				freed_mem->type = 1;
-				free.head->prev = freed_mem;
-				freed_mem->next = free.head;
-				free.head = freed_mem;
-			}
-		}
-	}
-	else if (address == allocated.tail->beginning_address){
-		struct cmcb *tail_mcb = allocated.tail;
-		allocated.tail = tail_mcb->prev;
-		tail_mcb->prev = NULL;
-		allocated.tail->next = NULL;
-		if (free.tail->beginning_address == (address - tail_mcb->size)){
-			free.tail->size += tail_mcb->size;
-		}
-		else if (free.tail->beginning_address == (address + tail_mcb->size)){
-			free.tail->beginning_address = address;
-			free.tail->size += tail_mcb->size;
-		}
-		else{
-			tail_mcb->type = 1;
-			tail_mcb->prev = free.tail;
-			free.tail->next = tail_mcb;
-			free.tail = tail_mcb;
-		}
-	}
+
 	struct cmcb *alloc_mcbs = allocated.head;
 	while (alloc_mcbs != NULL){
 		if (alloc_mcbs->beginning_address == address){
-			struct cmcb *selected = alloc_mcbs;
-			selected->prev->next = selected->next;
-			selected->next->prev = selected->prev;
-			struct cmcb *free_mcbs = free.head;
-			while (address >= free_mcbs->beginning_address){
-				free_mcbs = free_mcbs->next;
+			if (address == heap_address + sizeof(struct cmcb)){
+				if (allocated.count == 1){
+					serial_println("hello");
+					allocated.head = NULL;
+					allocated.tail = NULL;
+					free.head->beginning_address = address;
+					free.head->size = heapsize - sizeof(struct cmcb) - sizeof(struct lmcb);
+				}
+				else{
+					struct cmcb *freed_mem = allocated.head;
+					allocated.head = freed_mem->next;
+					freed_mem->next = NULL;
+					allocated.head->prev = NULL;
+					if (free.head->beginning_address == (heap_address + freed_mem->size + sizeof(struct lmcb) + sizeof(struct cmcb))){
+						free.head->beginning_address = address;
+						free.head->size += freed_mem->size;
+					}
+					else{
+						freed_mem->type = 1;
+						free.head->prev = freed_mem;
+						freed_mem->next = free.head;
+						free.head = freed_mem;
+					}
+				}
+				allocated.count--;
+				break;
 			}
-			if (free_mcbs->beginning_address == (address - selected->size)){
-				free_mcbs->size += selected->size;
+			else if (address == allocated.tail->beginning_address){
+				struct cmcb *tail_mcb = allocated.tail;
+				allocated.tail = tail_mcb->prev;
+				tail_mcb->prev = NULL;
+				allocated.tail->next = NULL;
+				if (free.tail->beginning_address == (address - tail_mcb->size -sizeof(struct lmcb) - sizeof(struct cmcb))){
+					free.tail->size += tail_mcb->size;
+				}
+				else if (free.tail->beginning_address == (address + tail_mcb->size + sizeof(struct lmcb) + sizeof(struct cmcb))){
+					free.tail->beginning_address = address;
+					free.tail->size += tail_mcb->size;
+				}
+				else{
+					tail_mcb->type = 1;
+					tail_mcb->prev = free.tail;
+					free.tail->next = tail_mcb;
+					free.tail = tail_mcb;
+				}
+				allocated.count--;
+				break;
 			}
-			else if (free_mcbs->beginning_address == (address + selected->size)){
-				free_mcbs->beginning_address = address;
-				free_mcbs->size += selected->size;
+			else {
+				struct cmcb *selected = alloc_mcbs;
+				selected->prev->next = selected->next;
+				selected->next->prev = selected->prev;
+				struct cmcb *free_mcbs = free.head;
+				while (address > free_mcbs->beginning_address){
+					free_mcbs = free_mcbs->next;
+				}
+				if (free_mcbs->beginning_address == (address - selected->size)){
+					free_mcbs->size += selected->size;
+				}
+				else if (free_mcbs->beginning_address == (address + selected->size)){
+					free_mcbs->beginning_address = address;
+					free_mcbs->size += selected->size;
+				}
+				else{
+					selected->type = 1;
+					free_mcbs->prev->next = selected;
+					selected->prev = free_mcbs->prev;
+					free_mcbs->prev = selected;
+					selected->next = free_mcbs;
+				}
+				allocated.count--;
+				break;
 			}
-			else{
-				selected->type = 1;
-				free_mcbs->prev->next = selected;
-				selected->prev = free_mcbs->prev;
-				free_mcbs->prev = selected;
-				selected->next = free_mcbs;
-			}
-			break;
 		}
 		alloc_mcbs = alloc_mcbs->next;
 	}
