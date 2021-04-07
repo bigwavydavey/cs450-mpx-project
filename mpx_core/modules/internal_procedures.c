@@ -617,6 +617,14 @@ void FreeMem(u32int address){
 	}
 }
 
+/**
+*	@brief This function returns a boolean
+*		   value indicating whether the allocated
+*		   list has any elements.
+*	@param none
+*	@retval 1 if allocated memory blocks exist in the queue
+*	@retval 0 if allocated memory queue is empty
+*/
 int isEmpty(){
 	if (allocated.head == NULL){
 		return 1;
@@ -626,18 +634,31 @@ int isEmpty(){
 	}
 }
 
+/**
+*	@brief This function interates through the list of
+*		   free memory blocks and displays the size
+*		   of the given block as well as its address
+*		   within the heap
+*	@param none
+*	@retval none
+*/
 void showFree(){
 	struct cmcb *cur = free.head;
 	char addr[10] = "";
 	char size[6] = "";
-	char msg[13]= "\nFree Block:";
-	char size_msg[7] = "Size: ";
-	char address[10] = "Address: ";
+	char msg[14]= "\nFree Block: \0";
+	char size_msg[8] = "Size: \0";
+	char address[11] = "Address: \0";
 	char newline[2] = "\n";
 	int address_size = strlen(address);
-	int size_msg_size = strlen(size);
+	int size_msg_size = 8;
 	int msg_size = strlen(msg);
 	int new_line = 1;
+
+	char empty_free[34] = "\nThere are no free blocks.\n";
+	int empty_free_size = strlen(empty_free);
+	if(cur == NULL)
+		sys_req(WRITE, DEFAULT_DEVICE, empty_free, &empty_free_size);
 
 	while(cur != NULL)
 	{
@@ -652,23 +673,37 @@ void showFree(){
 		itoa((int)cur->beginning_address, addr, 10);
 		int addr_size = strlen(addr);
 		sys_req(WRITE, DEFAULT_DEVICE, addr, &addr_size);
+		sys_req(WRITE, DEFAULT_DEVICE, newline, &new_line);
 
 		cur = cur->next;
 	}
 }
 
+/**
+*	@brief This function interates through the list of
+*		   allocated memory blocks and displays the size
+*		   of the given block as well as its address
+*		   within the heap
+*	@param none
+*	@retval none
+*/
 void showAllocated(){
 	struct cmcb *cur = allocated.head;
 	char addr[10] = "";
 	char size[5] = "";
 	char msg[20]= "\nAllocated Block:\n";
-	char size_msg[10] = "Size: ";
-	char address[10] = "Address: ";
-	char newline[1] = "\n";
+	char size_msg[8] = "Size: \0";
+	char address[11] = "Address: \0";
+	char newline[2] = "\n";
 	int address_size = strlen(address);
-	int size_msg_size = strlen(size);
+	int size_msg_size = 8;
 	int msg_size = strlen(msg);
 	int new_line = 1;
+
+	char empty_malloc[32] = "\nThere are no allocated blocks.\n";
+	int empty_malloc_size = strlen(empty_malloc);
+	if(cur == NULL)
+		sys_req(WRITE, DEFAULT_DEVICE, empty_malloc, &empty_malloc_size);
 
 	while(cur != NULL)
 	{
@@ -682,6 +717,7 @@ void showAllocated(){
 		int addr_size = strlen(addr);
 		sys_req(WRITE, DEFAULT_DEVICE, address, &address_size);
 		sys_req(WRITE, DEFAULT_DEVICE, addr, &addr_size);
+		sys_req(WRITE, DEFAULT_DEVICE, newline, &new_line);
 
 		cur = cur->next;
 	}
