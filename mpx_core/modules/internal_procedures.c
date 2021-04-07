@@ -433,10 +433,10 @@ void AllocateMem(u32int size){
 			}
 
 		}
-		else if (free_mcbs->size > (int)size){
-			free_mcbs->size = free_mcbs->size - allocate_size - allocated.count * (sizeof(struct cmcb) + sizeof(struct lmcb));
+		else if ((u32int)free_mcbs->size > (size + sizeof(struct cmcb) + sizeof(struct lmcb))){
+			free_mcbs->size = free_mcbs->size - allocate_size;
 			new_address = free_mcbs->beginning_address;
-			free_mcbs->beginning_address = new_address + allocate_size;
+			free_mcbs->beginning_address = new_address + size + sizeof(struct cmcb) + sizeof(struct lmcb);
 			struct cmcb *cmcb= (struct cmcb*) new_address;
 			cmcb->beginning_address = new_address;
 			cmcb->type = 0;
@@ -496,7 +496,11 @@ void FreeMem(u32int address){
 		if (alloc_mcbs->beginning_address == address){
 			if (address == heap_address + sizeof(struct cmcb)){
 				if (allocated.count == 1){
-					serial_println("hello");
+					if (free.head == NULL){
+						free.head = allocated.head;
+						free.head->type = 1;
+						free.tail = free.head;
+					}
 					allocated.head = NULL;
 					allocated.tail = NULL;
 					free.head->beginning_address = address;
@@ -507,9 +511,9 @@ void FreeMem(u32int address){
 					allocated.head = freed_mem->next;
 					freed_mem->next = NULL;
 					allocated.head->prev = NULL;
-					if (free.head->beginning_address == (heap_address + freed_mem->size + sizeof(struct lmcb) + sizeof(struct cmcb))){
+					if (free.head->beginning_address == (address + freed_mem->size + sizeof(struct lmcb) + sizeof(struct cmcb))){
 						free.head->beginning_address = address;
-						free.head->size += freed_mem->size;
+						free.head->size += freed_mem->size + sizeof(struct lmcb) + sizeof(struct cmcb);
 					}
 					else{
 						freed_mem->type = 1;
@@ -521,17 +525,27 @@ void FreeMem(u32int address){
 				allocated.count--;
 				break;
 			}
+			else if (allocated.count == 1){
+					allocated.head = NULL;
+					allocated.tail = NULL;
+					free.head->size = heapsize - sizeof(struct cmcb) - sizeof(struct lmcb);
+					free.tail = free.head->next->prev;
+					free.head->next->prev = NULL;
+					free.head->next = NULL;
+					allocated.count--;
+					break;
+			}
 			else if (address == allocated.tail->beginning_address){
 				struct cmcb *tail_mcb = allocated.tail;
 				allocated.tail = tail_mcb->prev;
 				tail_mcb->prev = NULL;
 				allocated.tail->next = NULL;
-				if (free.tail->beginning_address == (address - tail_mcb->size -sizeof(struct lmcb) - sizeof(struct cmcb))){
-					free.tail->size += tail_mcb->size;
+				if (free.tail->beginning_address == (address - free.tail->size - sizeof(struct lmcb) - sizeof(struct cmcb))){
+					free.tail->size += tail_mcb->size + sizeof(struct lmcb) + sizeof(struct cmcb);
 				}
 				else if (free.tail->beginning_address == (address + tail_mcb->size + sizeof(struct lmcb) + sizeof(struct cmcb))){
 					free.tail->beginning_address = address;
-					free.tail->size += tail_mcb->size;
+					free.tail->size += tail_mcb->size + sizeof(struct lmcb) + sizeof(struct cmcb);
 				}
 				else{
 					tail_mcb->type = 1;
@@ -542,27 +556,58 @@ void FreeMem(u32int address){
 				allocated.count--;
 				break;
 			}
+			else if (address == allocated.head->beginning_address){
+				struct cmcb *head_mcb = allocated.head;
+				allocated.head = head_mcb->next;
+				head_mcb->next = NULL;
+				allocated.head->prev = NULL;
+				if (free.head->beginning_address == (address - free.head->size - sizeof(struct lmcb) - sizeof(struct cmcb))){
+					free.head->size += head_mcb->size + sizeof(struct lmcb) + sizeof(struct cmcb);
+				}
+				else if (free.head->beginning_address == (address + head_mcb->size + sizeof(struct lmcb) + sizeof(struct cmcb))){
+					free.head->beginning_address = address;
+					free.head->size += head_mcb->size + sizeof(struct lmcb) + sizeof(struct cmcb);
+				}
+				allocated.count--;
+				break;
+			}
 			else {
 				struct cmcb *selected = alloc_mcbs;
 				selected->prev->next = selected->next;
 				selected->next->prev = selected->prev;
+				selected->next = NULL;
+				selected->prev = NULL;
 				struct cmcb *free_mcbs = free.head;
-				while (address > free_mcbs->beginning_address){
-					free_mcbs = free_mcbs->next;
-				}
-				if (free_mcbs->beginning_address == (address - selected->size)){
-					free_mcbs->size += selected->size;
-				}
-				else if (free_mcbs->beginning_address == (address + selected->size)){
-					free_mcbs->beginning_address = address;
-					free_mcbs->size += selected->size;
+				if (address < free_mcbs->beginning_address){
+					if (free_mcbs->beginning_address == (address + selected->size + sizeof(struct cmcb) + sizeof(struct lmcb))){
+						free_mcbs->beginning_address = address;
+						free_mcbs->size += selected->size + sizeof(struct cmcb) + sizeof(struct lmcb);
+					}
+					else {
+						selected->type = 1;
+						selected->next = free_mcbs;
+						free_mcbs->prev = selected;
+						free.head = selected;
+					}
 				}
 				else{
-					selected->type = 1;
-					free_mcbs->prev->next = selected;
-					selected->prev = free_mcbs->prev;
-					free_mcbs->prev = selected;
-					selected->next = free_mcbs;
+					while (address < free_mcbs->beginning_address){
+						free_mcbs = free_mcbs->next;
+					}
+					if (free_mcbs->beginning_address == (address - selected->size - sizeof(struct lmcb) - sizeof(struct cmcb))){
+						free_mcbs->size += selected->size + sizeof(struct lmcb) + sizeof(struct cmcb);
+					}
+					else if (free_mcbs->beginning_address == (address + selected->size + sizeof(struct cmcb) + sizeof(struct lmcb))){
+						free_mcbs->beginning_address = address;
+						free_mcbs->size += selected->size + sizeof(struct lmcb) + sizeof(struct cmcb);
+					}
+					else{
+						selected->type = 1;
+						free_mcbs->prev->next = selected;
+						selected->prev = free_mcbs->prev;
+						free_mcbs->prev = selected;
+						selected->next = free_mcbs;
+					}
 				}
 				allocated.count--;
 				break;
@@ -584,10 +629,11 @@ int isEmpty(){
 void showFree(){
 	struct cmcb *cur = free.head;
 	char addr[10] = "";
-	char size[5] = "";
-	char msg[20]= "\nFree Blocks:\n";
-	char size_msg[10] = "Size: \0";
-	char address[10] = "Address: \0";
+	char size[6] = "";
+	char msg[13]= "\nFree Block:";
+	char size_msg[7] = "Size: ";
+	char address[10] = "Address: ";
+	char newline[2] = "\n";
 	int address_size = strlen(address);
 	int size_msg_size = strlen(size);
 	int msg_size = strlen(msg);
@@ -596,14 +642,15 @@ void showFree(){
 	while(cur != NULL)
 	{
 		sys_req(WRITE, DEFAULT_DEVICE, msg, &msg_size);
+		sys_req(WRITE, DEFAULT_DEVICE, newline, &new_line);
 		sys_req(WRITE, DEFAULT_DEVICE, size_msg, &size_msg_size);
 		itoa(cur->size, size, 10);
 		int size_size = strlen(size);
 		sys_req(WRITE, DEFAULT_DEVICE, size, &size_size);
-		sys_req(WRITE, DEFAULT_DEVICE, "\n", &new_line);
+		sys_req(WRITE, DEFAULT_DEVICE, newline, &new_line);
+		sys_req(WRITE, DEFAULT_DEVICE, address, &address_size);
 		itoa((int)cur->beginning_address, addr, 10);
 		int addr_size = strlen(addr);
-		sys_req(WRITE, DEFAULT_DEVICE, address, &address_size);
 		sys_req(WRITE, DEFAULT_DEVICE, addr, &addr_size);
 
 		cur = cur->next;
@@ -614,9 +661,10 @@ void showAllocated(){
 	struct cmcb *cur = allocated.head;
 	char addr[10] = "";
 	char size[5] = "";
-	char msg[20]= "\nAllocated Blocks:\n";
-	char size_msg[10] = "Size: \0";
-	char address[10] = "Address: \0";
+	char msg[20]= "\nAllocated Block:\n";
+	char size_msg[10] = "Size: ";
+	char address[10] = "Address: ";
+	char newline[1] = "\n";
 	int address_size = strlen(address);
 	int size_msg_size = strlen(size);
 	int msg_size = strlen(msg);
@@ -629,7 +677,7 @@ void showAllocated(){
 		itoa(cur->size, size, 10);
 		int size_size = strlen(size);
 		sys_req(WRITE, DEFAULT_DEVICE, size, &size_size);
-		sys_req(WRITE, DEFAULT_DEVICE, "\n", &new_line);
+		sys_req(WRITE, DEFAULT_DEVICE, newline, &new_line);
 		itoa((int)cur->beginning_address, addr, 10);
 		int addr_size = strlen(addr);
 		sys_req(WRITE, DEFAULT_DEVICE, address, &address_size);
