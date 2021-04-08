@@ -82,6 +82,9 @@ void kmain(void)
    // this allocates memory using discrete "pages" of physical memory
    // NOTE:  You will only have about 70000 bytes of dynamic memory
    //
+   //InitializeHeap(70000);
+   //sys_set_malloc(AllocateMem);
+   //sys_set_free(FreeMem);
    init_paging();
    klogv("Initializing virtual memory...");
 
