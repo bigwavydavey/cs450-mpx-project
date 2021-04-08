@@ -343,6 +343,15 @@ struct pcb * SetupPCB(char * processName, int class, int priority){
 	return pcb_point;
 }
 
+/**
+* @brief This function calls kmalloc to initialize
+*		 the entire heap from which MPX processes 
+*		 will request memory
+*
+* @param u32int size: Total bytes of memory the heap
+*				      will contain
+* @retval none
+*/
 void InitializeHeap(u32int size){
 	heapsize = size + sizeof(struct cmcb) + sizeof(struct lmcb);
 	heap_address = kmalloc(heapsize);
@@ -358,6 +367,14 @@ void InitializeHeap(u32int size){
 	free.count = 1;
 }
 
+/**
+* @brief This function will allocate a free block
+*		 of memory to an MPX process, the size of which
+*		 depends on the need of the calling process
+*
+* @param u32int size: Total bytes of memory being requested
+* @retval none
+*/
 void AllocateMem(u32int size){
 	int allocate_size = size + sizeof(struct cmcb) + sizeof(struct lmcb);
 	u32int new_address;
@@ -489,6 +506,15 @@ void AllocateMem(u32int size){
 	}
 }
 
+/**
+* @brief This function frees up an allocated memory
+*		 block and adds the previosuly allocated block
+*		 back into the free memory queue
+*
+* @param u32int address: Address within the heap of the
+						memory block to be freed 
+* @retval none
+*/
 void FreeMem(u32int address){
 
 	struct cmcb *alloc_mcbs = allocated.head;
@@ -622,8 +648,8 @@ void FreeMem(u32int address){
 *		   value indicating whether the allocated
 *		   list has any elements.
 *	@param none
-*	@retval 1 if allocated memory blocks exist in the queue
-*	@retval 0 if allocated memory queue is empty
+*	@retval int 1 if allocated memory blocks exist in the queue
+*	@retval int 0 if allocated memory queue is empty
 */
 int isEmpty(){
 	if (allocated.head == NULL){

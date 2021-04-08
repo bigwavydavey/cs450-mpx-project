@@ -3,6 +3,9 @@
 
 #include <system.h>
 
+/**
+*	@brief This struct supports the 4 pcb queues used in MPX
+*/
 struct queue
 {
   int count;
@@ -10,6 +13,9 @@ struct queue
   struct pcb *tail;
 };
 
+/**
+*	@brief This struct supports allocated and free queues of the heap manager
+*/
 struct cmcb_queue
 {
 	int count;
@@ -17,13 +23,9 @@ struct cmcb_queue
 	struct cmcb *tail;
 };
 
-struct lmcb_queue
-{
-	int count;
-	struct lmcb *head;
-	struct lmcb *tail;
-};
-
+/**
+*	@brief This struct encapsulates processes withing the MPX System
+*/
 struct pcb
 {
 	char name[10];
@@ -38,6 +40,10 @@ struct pcb
 	struct pcb *prev;
 };
 
+/**
+*	@brief This struct stores a process's current state from the
+*		   CPU registers to support context switches
+*/
 struct context
 {
 	u32int gs, fs, es, ds;
@@ -66,6 +72,9 @@ struct alarm_list
   struct alarm *tail;
 };
 
+/**
+*	@brief This struct represents an allocated block of memory
+*/
 struct cmcb
 {
 	//0 Allocated, 1 Free
@@ -76,6 +85,9 @@ struct cmcb
 	struct cmcb *prev;
 };
 
+/**
+*	@brief This struct represents an free block of memory
+*/
 struct lmcb
 {
 	int type;

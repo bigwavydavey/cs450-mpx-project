@@ -328,8 +328,6 @@ void optional_cmd_handler(char * cmd_buffer)
 void help()
 {
   buffer_size = 700;
-
-  //R1 commands
   sys_req(WRITE, DEFAULT_DEVICE, "\nhelp: prints list of commands and explains their functionality\n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, "\nversion: prints the current version of OS Allstars' MPX and most recent\nrelease date\n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE,  "\nshutdown: shutsdown the MPX system. You will be asked for confirmation\n", &buffer_size);
@@ -337,19 +335,16 @@ void help()
   sys_req(WRITE, DEFAULT_DEVICE, "\nsetdate: sets a user input date to the register\n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, "\ngettime: prints the current time of day as stored in MPX register\n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, "\nsettime: sets a user input time of day to the register\n", &buffer_size);
-
-  //R2 commands
   //sys_req(WRITE, DEFAULT_DEVICE, "\ncreatepcb [pcb_name] [pcb_class] [pcb_priority]: This command will create a new PCB for the given attributes, pcb_name, pcb_priority, pcb_class.\n", &buffer_size);
-  sys_req(WRITE, DEFAULT_DEVICE, "\ndeletepcb [pcb_name]: This command will delete a selected pcb from all 4 of the PCB queues, removing them completely from the system.\n", &buffer_size);
+  sys_req(WRITE, DEFAULT_DEVICE, "\ndeletepcb [pcb_name]: This command will delete a selected pcb from all 4 of the PCB queues\n", &buffer_size);
   //sys_req(WRITE, DEFAULT_DEVICE, "\nblockpcb [pcb_name]: This command will set the selected PCB’s state to blocked and insert it into the appropriate PCB queue. pcb_name must be a valid PCB already in existence. \n", &buffer_size);
   //sys_req(WRITE, DEFAULT_DEVICE, "\nunblockpcb [pcb_name]: This command will set the selected PCB’s state to unblocked and insert it in to theappropriate PCB queue. pcb_name must be valid. \n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, "\nsuspendpcb [pcb_name]: This command will set the selected PCB’s state to suspended and insert it in tothe appropriate PCB queue.\n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, "\nresumepcb [pcb_name]: This command will set the selected PCB’s state to unsuspended and insert it in tothe appropriate PCB queue.\n", &buffer_size);
-  sys_req(WRITE, DEFAULT_DEVICE, "\nsetpriority [pcb_name]: This command will set the selected PCB’s priority to a new user desired priority,\npossibly changing its location withing the queues.\n", &buffer_size);
-  sys_req(WRITE, DEFAULT_DEVICE, "\nshowpcb [pcb_name]: This command will display the attributes of a selected PCB in the terminal.\n\n", &buffer_size);
+  sys_req(WRITE, DEFAULT_DEVICE, "\nsetpriority [pcb_name]: This command will set the selected PCB’s priority to a new user desired priority\n", &buffer_size);
+  sys_req(WRITE, DEFAULT_DEVICE, "\nshowpcb [pcb_name]: This command will display the attributes of a selected PCB in the terminal.\n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, "\nsuspendpcb [pcb_name]: This command will set the selected PCB’s state to suspended and insert it in to the appropriate PCB queue.\n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, "\nresumepcb [pcb_name]: This command will set the selected PCB’s state to unsuspended and insert it in to the appropriate PCB queue.\n", &buffer_size);
-  sys_req(WRITE, DEFAULT_DEVICE, "\nsetpriority [pcb_name]: This command will set the selected PCB’s priority to a new user desired priority,\npossibly changing its location withing the queues.\n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, "\nshowpcb [pcb_name]: This command will display the attributes of a selected PCB in the terminal.\n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, "\nshowreadypcb: This command will display all processes contained within the two ready queues in the terminal.\n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, "\nshowreadypcb: This command will display all processes contained within the two ready queues in the terminal.\n", &buffer_size);
@@ -357,7 +352,7 @@ void help()
   sys_req(WRITE, DEFAULT_DEVICE, "\nshowpcbs: This commands will display all existing processes, in all four queues, in the terminal.\n", &buffer_size);
   //sys_req(WRITE, DEFAULT_DEVICE, "\nyield: This command forces the command handler to let other processes execute.\n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, "\nloadr3: This command loads 5 processes into memory to test R3.\n", &buffer_size);
-  sys_req(WRITE, DEFAULT_DEVICE, "\nloadr3: Loads test processes for R3\n", &buffer_size);
+  sys_req(WRITE, DEFAULT_DEVICE, "\nloadr3: Loads test processes for process operations\n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, "\ninf: Loads the infinite process and adds it to ready queue.\n", &buffer_size);
   sys_req(WRITE, DEFAULT_DEVICE, "\nalarm: Creates an alarm process that will display a custom message at a time you will be asked to specify.\n", &buffer_size);
 }
@@ -409,7 +404,7 @@ void cmd_handler()
     //Version command
     if (strcmp(cmd_buffer, "version") == 0) // see if buffer matches version command
     {
-      char * current_version = "\nOS Allstars' MPX Version 4.0, last updated March 18, 2021\n";
+      char * current_version = "\nOS Allstars' MPX Version 5.0, last updated April 8, 2021\n";
       sys_req(WRITE, DEFAULT_DEVICE, current_version, &buffer_size);
     }
     //Shutdown command
