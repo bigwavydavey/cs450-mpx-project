@@ -296,6 +296,7 @@ void optional_cmd_handler(char * cmd_buffer)
   {
     ShowPCB(pcb_name);
   }
+  /*
   else if(strcmp(cmd_buffer, "malloc") == 0)
   {
     int bytes = atoi(pcb_name);
@@ -305,7 +306,7 @@ void optional_cmd_handler(char * cmd_buffer)
   {
     u32int address = (u32int)(atoi(pcb_name));
     FreeMem(address);  
-  }
+  }*/
   //Command not recognized
   else
   {
@@ -516,7 +517,7 @@ void cmd_handler()
 
       add_alarm( alarm_time, alarm_msg );
     }
-    else if(strcmp(cmd_buffer, "initheap") == 0)
+    /*else if(strcmp(cmd_buffer, "initheap") == 0)
       InitializeHeap(1000);
     else if(strcmp(cmd_buffer, "isempty") == 0)
     {
@@ -533,11 +534,12 @@ void cmd_handler()
         sys_req(WRITE, DEFAULT_DEVICE, not_empty_msg, &not_empty_msg_size);
       }
     }
+    
     else if(strcmp(cmd_buffer, "showfree") == 0){
       showFree();
     }
     else if(strcmp(cmd_buffer, "showmalloc") == 0)
-      showAllocated();
+      showAllocated();*/
     //Command not recognized
     else
     {
