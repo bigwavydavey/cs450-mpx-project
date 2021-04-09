@@ -51,7 +51,7 @@ void kmain(void)
    // 1) Initialize the support software by identifying the current
    //     MPX Module.  This will change with each module.
    // you will need to call mpx_init from the mpx_supt.c
-   mpx_init(MODULE_R4);
+   mpx_init(MEM_MODULE);
 
    // 2) Check that the boot was successful and correct when using grub
    // Comment this when booting the kernel directly using QEMU, etc.
@@ -82,10 +82,10 @@ void kmain(void)
    // this allocates memory using discrete "pages" of physical memory
    // NOTE:  You will only have about 70000 bytes of dynamic memory
    //
-   //InitializeHeap(70000);
-   //sys_set_malloc(AllocateMem);
-   //sys_set_free(FreeMem);
-   init_paging();
+   InitializeHeap(50000);
+   sys_set_malloc(AllocateMem);
+   sys_set_free(FreeMem);
+   //init_paging();
    klogv("Initializing virtual memory...");
 
 

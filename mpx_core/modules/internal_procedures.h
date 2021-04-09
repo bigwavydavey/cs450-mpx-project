@@ -17,7 +17,7 @@ void RemovePCB(struct pcb *PCB);
 struct pcb * SetupPCB(char *processName, int class, int priority);
 void InitializeHeap(u32int size);
 u32int AllocateMem(u32int size);
-void FreeMem(u32int address);
+int FreeMem(void* address);
 int isEmpty();
 void showFree();
 void showAllocated();
