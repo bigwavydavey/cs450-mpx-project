@@ -517,8 +517,8 @@ void cmd_handler()
 
       add_alarm( alarm_time, alarm_msg );
     }
-    /*else if(strcmp(cmd_buffer, "initheap") == 0)
-      InitializeHeap(1000);
+    //else if(strcmp(cmd_buffer, "initheap") == 0)
+      //InitializeHeap(1000);
     else if(strcmp(cmd_buffer, "isempty") == 0)
     {
       if (isEmpty() == 1)
@@ -539,7 +539,7 @@ void cmd_handler()
       showFree();
     }
     else if(strcmp(cmd_buffer, "showmalloc") == 0)
-      showAllocated();*/
+      showAllocated();
     //Command not recognized
     else
     {

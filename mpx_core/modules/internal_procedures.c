@@ -101,18 +101,16 @@ struct pcb * FindPCB(char *processName){
 *
 */
 void FreePCB(struct pcb *PCB){
-	char * success = "\nSuccess!\0";
+	char success[32] = "\nSuccess! PCB freed from memory";
 	int success_size = strlen(success);
-	int *success_len = &success_size;
-	char * failure = "\nERROR: The PCB could not be freed from memory\0";
+	char failure[46] = "\nERROR: The PCB could not be freed from memory";
 	int failure_size = strlen(failure);
-	int *failure_len = &failure_size;
 
 	if (sys_free_mem(PCB) == -1){
-		sys_req(WRITE, DEFAULT_DEVICE, failure, failure_len);
+		sys_req(WRITE, DEFAULT_DEVICE, failure, &failure_size);
 	}
 	else{
-		sys_req(WRITE, DEFAULT_DEVICE, success, success_len);
+		sys_req(WRITE, DEFAULT_DEVICE, success, &success_size);
 	}
 }
 
@@ -565,7 +563,6 @@ int FreeMem(void* address){
 					free.head->prev = NULL;
 				}
 				else{
-					//struct cmcb *alloc_mcbs = allocated.head;
 					allocated.head = alloc_mcbs->next;
 					alloc_mcbs->next = NULL;
 					allocated.head->prev = NULL;
@@ -596,7 +593,6 @@ int FreeMem(void* address){
 				return 0;
 			}
 			else if ((u32int)address == allocated.tail->beginning_address){
-				//struct cmcb *alloc_mcbs = allocated.tail;
 				allocated.tail = alloc_mcbs->prev;
 				alloc_mcbs->prev = NULL;
 				allocated.tail->next = NULL;
@@ -624,14 +620,12 @@ int FreeMem(void* address){
 				return 0;
 			}
 			else if ((u32int)address == allocated.head->beginning_address){
-				//struct cmcb *alloc_mcbs = allocated.head;
 				allocated.head = alloc_mcbs->next;
 				alloc_mcbs->next = NULL;
 				allocated.head->prev = NULL;
 				if (free.head->beginning_address == ((u32int)address - free.head->size - sizeof(struct cmcb))){
 					free.head->size += alloc_mcbs->size + sizeof(struct cmcb);
 					if (free.head->next->beginning_address == ((u32int)address + alloc_mcbs->size + sizeof(struct cmcb))){
-						//free_mcbs->beginning_address = (u32int)address;
 						free.head->size += free.head->next->size + sizeof(struct cmcb);
 						free.head->next->prev = NULL;
 						free.head->next = free.head->next->next;
@@ -654,7 +648,6 @@ int FreeMem(void* address){
 				return 0;
 			}
 			else {
-				//struct cmcb *alloc_mcbs = alloc_mcbs;
 				alloc_mcbs->prev->next = alloc_mcbs->next;
 				alloc_mcbs->next->prev = alloc_mcbs->prev;
 				alloc_mcbs->next = NULL;
@@ -676,10 +669,10 @@ int FreeMem(void* address){
 					while ((u32int)address > free_mcbs->beginning_address){
 						free_mcbs = free_mcbs->next;
 					}
-					if (free_mcbs->prev->beginning_address == ((u32int)address - free_mcbs->size - sizeof(struct cmcb))){
+
+					if (free_mcbs->prev->beginning_address == ((u32int)address - free_mcbs->prev->size - sizeof(struct cmcb))){
 						free_mcbs->prev->size += alloc_mcbs->size + sizeof(struct cmcb);
 						if (free_mcbs->beginning_address == ((u32int)address + alloc_mcbs->size + sizeof(struct cmcb))){
-							//free_mcbs->beginning_address = (u32int)address;
 							free_mcbs->prev->size += free_mcbs->size + sizeof(struct cmcb);
 							free_mcbs->prev->next = free_mcbs->next;
 							free_mcbs->next->prev = free_mcbs->prev;
