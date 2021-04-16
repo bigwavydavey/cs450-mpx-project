@@ -23,6 +23,13 @@ struct cmcb_queue
 	struct cmcb *tail;
 };
 
+struct io_queue
+{
+	int count;
+	struct iocb *head;
+	struct iocb *tail;
+};
+
 /**
 *	@brief This struct encapsulates processes withing the MPX System
 */
@@ -85,13 +92,27 @@ struct cmcb
 	struct cmcb *prev;
 };
 
-/**
-*	@brief This struct represents an free block of memory
-*/
-struct lmcb
+struct dcb
 {
-	int type;
-	int size;
+	int open_flag;
+	int *event_flag;
+	int status_code;
+	char input[100];
+	char output[100];
+	u32int input_address;
+	u32int output_address;
+	char ring_buffer[100];
+};
+
+struct iocb
+{
+	struct pcb *process;
+	struct dcb *device;
+	int operation;
+	char buffer[100];
+	int buffer_size;
+	struct iocb *next;
+	struct iocb *prev;
 };
 
 struct queue ready_suspended;
