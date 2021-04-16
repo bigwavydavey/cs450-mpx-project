@@ -370,15 +370,7 @@ void help()
   @endcode
 
   would be the correct way to issue to "help command".
-    Currently implemented commands:
-    --help
-    --version: provides user with current version of MPX
-    --shutdown: begins shutdown of MPX
-    --settime: sets a user entered time to MPX registers
-    --gettime: prints the current time, according to MPX registers
-    --setdate: sets a user entered date to MPX registers
-    --getdate: prints the current time, according to MPX registers
-
+    
   @param none
 
   @retval none
@@ -519,7 +511,7 @@ void cmd_handler()
     }
     //else if(strcmp(cmd_buffer, "initheap") == 0)
       //InitializeHeap(1000);
-    else if(strcmp(cmd_buffer, "isempty") == 0)
+    /*else if(strcmp(cmd_buffer, "isempty") == 0)
     {
       if (isEmpty() == 1)
       {
@@ -539,7 +531,7 @@ void cmd_handler()
       showFree();
     }
     else if(strcmp(cmd_buffer, "showmalloc") == 0)
-      showAllocated();
+      showAllocated();*/
     //Command not recognized
     else
     {

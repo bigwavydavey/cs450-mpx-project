@@ -121,12 +121,6 @@ void FreePCB(struct pcb *PCB){
 *
 */
 void InsertPCB(struct pcb *PCB){
-/*
-	if tail has higher priority than PCB
-		put on tail of queue
-	else
-		search queue for priority, then insert at end of priority
-*/
 	if (PCB->state == 0){
 		//ready_not_suspended queue
 		if (ready_not_suspended.count == 0){
