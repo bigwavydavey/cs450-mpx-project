@@ -20,7 +20,8 @@ sys_call.o\
 procsr3.o\
 userR3Commands.o\
 R4processes.o\
-serial_port_driver.o
+serial_port_driver.o\
+io_int_handlers.o
 .c.s:
 	$(CC) $(CFLAGS) -S -o $@ $<
 .s.o:

@@ -96,12 +96,18 @@ struct dcb
 {
 	int open_flag;
 	int *event_flag;
+	//0 idle, 1 reading, 2 writing
 	int status_code;
 	char input[100];
 	char output[100];
+	int read_count;
+	int write_count;
+	int read_num_chars;
+	int write_num_chars;
 	u32int input_address;
 	u32int output_address;
 	char ring_buffer[100];
+	int ring_buf_pos;
 };
 
 struct iocb
