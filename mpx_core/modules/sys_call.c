@@ -3,6 +3,7 @@
 #include "internal_procedures.h"
 #include "string.h"
 #include "serial_port_driver.h"
+#include <core/serial.h>
 
 struct pcb* cop;
 struct context* reference;
@@ -34,7 +35,7 @@ u32int* sys_call(struct context *registers )
       cop->top = (unsigned char*)registers;
       cop->state = 0;
       temp = cop;
-      InsertPCB(cop);
+      //InsertPCB(cop);
     }
     else if( params.op_code == EXIT ){
       FreePCB(cop);

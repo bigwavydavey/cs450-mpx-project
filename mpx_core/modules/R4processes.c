@@ -61,7 +61,6 @@ void add_alarm( char* alarm_time, char* alarm_msg )
 */
 void alarm_proc()
 {
-  serial_println("boop");
   char alarm_time_copy[10];
   while (1){
     if (alarms.head != NULL){
