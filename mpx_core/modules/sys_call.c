@@ -1,6 +1,7 @@
 #include "mpx_supt.h"
 #include "structs.h"
 #include "internal_procedures.h"
+#include "string.h"
 #include "serial_port_driver.h"
 
 struct pcb* cop;
@@ -20,7 +21,7 @@ u32int* sys_call(struct context *registers )
   int com_ercode;
   struct iocb* new_iocb = sys_alloc_mem(sizeof(struct iocb));
 
-  struct pcb* temp = NULL;
+  //struct pcb* temp = NULL;
   if( cop == NULL )
   {
     reference = registers;
@@ -32,8 +33,8 @@ u32int* sys_call(struct context *registers )
     {
       cop->top = (unsigned char*)registers;
       cop->state = 0;
-      temp = cop;
-      //InsertPCB(cop);
+      //temp = cop;
+      InsertPCB(cop);
     }
     else if( params.op_code == EXIT ){
       FreePCB(cop);
@@ -68,14 +69,15 @@ u32int* sys_call(struct context *registers )
           if(params.op_code == READ)
           {
             com_ercode = com_read(new_iocb->buffer, new_iocb->buffer_size);
-            cop->state = 0;
-            InsertPCB(cop);
+            /*cop->state = 0;
+            InsertPCB(cop);*/
           }
           else if(params.op_code == WRITE)
           {
+            klogv("first time");
             com_ercode = com_write(new_iocb->buffer, new_iocb->buffer_size);
-            cop->state = 0;
-            InsertPCB(cop);
+            /*cop->state = 0;
+            InsertPCB(cop);*/
           }
         }
     }
@@ -85,9 +87,11 @@ u32int* sys_call(struct context *registers )
     int buff = 10;
     sys_req(WRITE, DEFAULT_DEVICE, "com error", &buff);
   }
-
-  if(new_iocb->device->event_flag == 1)
+  int check_flag = 1;
+  int * check_flag_ptr = &check_flag;
+  if(new_iocb->device->event_flag == check_flag_ptr)
   {
+    klogv("check");
     struct iocb* iocb_ptr = io_queue->head;
     io_queue->head = io_queue->head->next;
     iocb_ptr->next = NULL;
@@ -106,6 +110,7 @@ u32int* sys_call(struct context *registers )
       }
       else if(new_iocb->operation == WRITE)
       {
+        klogv("second");
         com_ercode = com_write(new_iocb->buffer, new_iocb->buffer_size);
         cop->state = 0;
         InsertPCB(cop);
@@ -120,8 +125,8 @@ u32int* sys_call(struct context *registers )
     struct pcb* rdy_process = ready_not_suspended.head;
     RemovePCB(rdy_process);
     rdy_process->state = 5;
-    if(temp != NULL)
-      InsertPCB(temp);
+    /*if(temp != NULL)
+      InsertPCB(temp);*/
     cop = rdy_process;
     return (u32int*)cop->top;
   }

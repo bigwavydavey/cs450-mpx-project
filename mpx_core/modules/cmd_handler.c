@@ -382,8 +382,9 @@ void cmd_handler()
   int buffer_size = 99;
   int quit = 0;
 
-  char * startup_msg = "\nWelcome to OS Allstars' MPX. Enter help for a list of commands.\n";
-  sys_req(WRITE, DEFAULT_DEVICE, startup_msg, &buffer_size);
+  char * startup_msg = "Welcome to OS Allstars' MPX. Enter help for a list of commands.\n";
+  int startup_msg_size = sizeof(startup_msg);
+  sys_req(WRITE, DEFAULT_DEVICE, startup_msg, &startup_msg_size);
 
 
   while(!quit)
@@ -399,7 +400,8 @@ void cmd_handler()
     if (strcmp(cmd_buffer, "version") == 0) // see if buffer matches version command
     {
       char * current_version = "\nOS Allstars' MPX Version 5.0, last updated April 8, 2021\n";
-      sys_req(WRITE, DEFAULT_DEVICE, current_version, &buffer_size);
+      int current_version_size = sizeof(current_version);
+      sys_req(WRITE, DEFAULT_DEVICE, current_version, &current_version_size);
     }
     //Shutdown command
     else if (strcmp(cmd_buffer, "shutdown") == 0)

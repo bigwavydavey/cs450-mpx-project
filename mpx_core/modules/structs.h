@@ -98,8 +98,8 @@ struct dcb
 	int *event_flag;
 	//0 idle, 1 reading, 2 writing
 	int status_code;
-	char input[100];
-	char output[100];
+	char *input;
+	char *output;
 	int read_count;
 	int write_count;
 	int read_num_chars;

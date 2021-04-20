@@ -12,78 +12,80 @@
 
 extern void first_level_int_isr();
 
-struct dcb *device;
+struct dcb device = {.open_flag = 1};
 u32int old_handler;
 int *event_flag_copy;
 u32int old_mask;
 
 int com_open (int *eflag_p, int baud_rate){
+	cli();
 	//Steps from R6 Detailed
 	//1. Esnure that params are valid
 	if(eflag_p == NULL)
 		return -101;
 	if(baud_rate <= 0)
 		return -102;
-	if (device != NULL)
-		return -103;
+	/*if (device != NULL)
+		return -103;*/
 
 	//2. Initialize the DCB
 
-	device = sys_alloc_mem(sizeof(struct dcb));
-	device->open_flag = 1;
-	device->event_flag = eflag_p;
-	device->status_code = 0;
-	device->input_address = COM1;
-	device->output_address = COM1;
-	device->read_count = 0;
-	device->write_count = 0;
-	device->read_num_chars = 0;
-	device->write_num_chars = 0;
-	strcpy(device->ring_buffer, " ");
-	device->ring_buf_pos = 0;
+	//device = sys_alloc_mem(sizeof(struct dcb));
+	device.open_flag = 1;
+	device.event_flag = eflag_p;
+	device.input_address = COM1;
+	device.output_address = COM1;
+	device.read_count = 0;
+	device.write_count = 0;
+	device.read_num_chars = 0;
+	device.write_num_chars = 0;
+	memset(device.ring_buffer, '\0', 100);
+	device.ring_buf_pos = 0;
 	event_flag_copy = eflag_p;
+	device.status_code = 0;
 	//3. Save address of the current interrupt handler
 	//   Install new handler int interrupt vector
 	old_handler = idt_get_gate(0x24);
 	idt_set_gate(0x24, (u32int) first_level_int_isr, 0x08, 0x8e);
-
+	//outb(0x0030, (u32int) &first_level_int_isr);
 	//4. Compute the baud rate divisor
-	int baud_rate_div = 115200 / (long) baud_rate;
-	int brd_MSB = baud_rate_div & 0xFFFF0000;
-	int brd_LSB = baud_rate_div & 0x0000FFFF;
+	/*int baud_rate_div = 115200 / (long) baud_rate;
+	int brd_MSB = baud_rate_div & 0xFFFF;
+	int brd_LSB = baud_rate_div & 0x0000;*/
 
+	outb(COM1+1, 0x00); //disable interrupts
 	//5. Store 0x80 in the Line Control Register
 	outb(COM1+3, 0x08); //Write to Line Control
 
 	//6. Store high and low order bits of the baud rate divisor
-	outb(COM1, (u32int) brd_LSB); //Write to Baud Rate LSB
-	outb(COM1+1, (u32int) brd_MSB);//Write to Baude Rate MSB
+	outb(COM1 + 0, 115200/1200); //set bsd least sig bit
+	outb(COM1 + 1, 0x00); //brd most significant bit
 
 	//7. Store value 0x03 in Line Control Register
 	outb(COM1+3, 0x03); //Write to Line Control
 
 	//8. Enable PIC mask level 4
-	outb(COM1+1, 0x00); //disable interrupts
 	old_mask = inb(PIC_MASK);
-	int new_mask = old_mask & ~0x40;
+	int new_mask = old_mask & ~0x10;
 	outb(PIC_MASK, new_mask);
 	outb(COM1+4, 0x0B);//enable interrupts
 
 	//9. Enable serial port interrupts
-	outb(COM1+4, 0x08); //Write to Modem Control
-	//10. Endable input ready interrupts
+	//outb(COM1+4, 0x08); //Write to Modem Control
+	//10. Enable input ready interrupts
 	outb(COM1+1, 0x01); //Write to Interrupt Enable
-
+	(void)inb(COM1);
+	sti();
 	return 0;
 }
 
 int com_close (void){
 	//1. Ensure port is open
-	if(device->open_flag == 0)
+	if(device.open_flag == 0)
 		return -201;
 
 	//2. Clear open indicator in DCB
-	device->open_flag = 0;
+	device.open_flag = 0;
 
 	//3. Disable PIC mask level 4
 	outb(COM1+1, 0x00); //disable interrupts
@@ -103,57 +105,64 @@ int com_close (void){
 }
 
 int com_read (char *buf_p, int *count_p){
-	if(device->open_flag == 0)
+	if(device.open_flag == 0)
 		return -301;
 	if(buf_p == NULL)
 		return -302;
 	if(count_p == NULL || *count_p < 0)
 		return -303;
-	if(device->status_code != 0)
+	if(device.status_code != 0)
 		return -304;
 
-	strcpy(device->input, " ");
-	device->read_count = *count_p;
-	device->status_code = 1;
-	device->event_flag = 0;
+	device.input = buf_p;
+	device.read_count = *count_p;
+	device.status_code = 1;
+	device.event_flag = 0;
 
 	int real_read_count = 0;
-	outb(COM1+1, 0x00); //disable interrupts
-	char letter = (device->ring_buffer)[0];
-	while(real_read_count < device->read_count && letter != '\r' && letter != NULL)
+	//outb(COM1+1, 0x00); //disable interrupts
+	cli();
+	char letter = (device.ring_buffer)[0];
+	while(real_read_count < device.read_count && letter != 13 && letter != NULL)
 	{
-		buf_p[real_read_count] = (device->ring_buffer)[real_read_count];
-		(device->ring_buffer)[real_read_count] = NULL;
+		buf_p[real_read_count] = (device.ring_buffer)[real_read_count];
+		(device.ring_buffer)[real_read_count] = NULL;
 		real_read_count++;
-		letter = (device->ring_buffer)[real_read_count];
+		letter = (device.ring_buffer)[real_read_count];
 	}
-	outb(COM1+4, 0x0B); //enable interrupts
+	sti();
+	//outb(COM1+4, 0x0B); //enable interrupts
 
-	device->status_code = 0;
-	device->event_flag = event_flag_copy;
+	device.status_code = 0;
+	int set_flag = 1;
+	int *set_flag_ptr = &set_flag;
+	device.event_flag = set_flag_ptr;
 	*count_p = real_read_count;
 	return 0;
 }
 
 int com_write (char *buf_p, int *count_p){
-	if(device->open_flag == 0)
+	//cli();
+	klogv("hello");
+	if(device.open_flag == 0)
 		return -401;
 	if(buf_p == NULL)
 		return -402;
 	if(count_p == NULL || *count_p < 0)
 		return -403;
-	if(device->status_code != 0)
+	if(device.status_code != 0)
 		return -404;
 
-	strcpy(device->output, buf_p);
-	device->write_count = *count_p;
-	device->status_code = 2;
-	device->event_flag = 0;
+	device.output = buf_p;
+	device.write_count = *count_p;
+	device.status_code = 2;
+	device.event_flag = 0;
 
 	outb(COM1, buf_p[0]);
 	u32int old_ier = inb(COM1+1);
 	int new_ier = old_ier | 0x02;
 	outb(COM1+1, (u32int) new_ier);
 
+	//sti();
 	return 0;
 }

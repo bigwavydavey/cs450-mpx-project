@@ -29,7 +29,7 @@
 #include "modules/R4processes.h"
 #include "modules/serial_port_driver.h"
 
-
+int *flag = 0;
 
 void kmain(void)
 {
@@ -42,9 +42,10 @@ void kmain(void)
    // 0) Initialize Serial I/O
    // functions to initialize serial I/O can be found in serial.c
    // there are 3 functions to call
-   init_serial(COM1);
+   //init_serial(COM1);
    set_serial_in(COM1);
    set_serial_out(COM1);
+
 
    klogv("Starting MPX boot sequence...");
    klogv("Initialized serial I/O on COM1 device...");
@@ -53,6 +54,7 @@ void kmain(void)
    //     MPX Module.  This will change with each module.
    // you will need to call mpx_init from the mpx_supt.c
    mpx_init(MEM_MODULE);
+   mpx_init(IO_MODULE);
 
    // 2) Check that the boot was successful and correct when using grub
    // Comment this when booting the kernel directly using QEMU, etc.
@@ -86,6 +88,7 @@ void kmain(void)
    InitializeHeap(50000);
    sys_set_malloc(AllocateMem);
    sys_set_free(FreeMem);
+   com_open(flag, 1200);
    //init_paging();
    klogv("Initializing virtual memory...");
 

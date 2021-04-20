@@ -7,6 +7,7 @@
 #include "io_int_handlers.h"
 
 void first_level_int(struct dcb *DCB){
+	klogv("hello interrupt");
 	if (DCB->open_flag == 0){
 		outb(0x20, 0x20);
 		return;
