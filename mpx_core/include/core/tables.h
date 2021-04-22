@@ -40,6 +40,7 @@ typedef struct gdt_entry_struct
 
 
 void idt_set_gate(u8int idx, u32int base, u16int sel, u8int flags);
+u32int idt_get_gate(u8int idx);
 void gdt_init_entry(int idx, u32int base, u32int limit, u8int access, 
 		    u8int flags);
 

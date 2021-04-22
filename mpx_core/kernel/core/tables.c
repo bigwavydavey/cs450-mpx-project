@@ -35,6 +35,11 @@ void idt_set_gate(u8int idx, u32int base, u16int sel,
   new_entry->flags = flags;
 }
 
+u32int idt_get_gate(u8int idx)
+{
+  return (u32int) &idt_entries[idx];
+}
+
 /*
   Procedure..: init_idt
   Description..: Creates the interrupt descriptor table and 
