@@ -15,6 +15,7 @@ extern void first_level_int_isr();
 
 struct dcb *device;
 u32int old_handler;
+int *event_flag_copy;
 u32int old_mask;
 int com_open (int *eflag_p, int baud_rate){
 	//Steps from R6 Detailed
@@ -40,7 +41,7 @@ int com_open (int *eflag_p, int baud_rate){
 	device->write_num_chars = 0;
 	strcpy(device->ring_buffer, " ");
 	device->ring_buf_pos = 0;
-
+	event_flag_copy = eflag_p;
 	//3. Save address of the current interrupt handler
 	//   Install new handler int interrupt vector
 	old_handler = idt_get_gate(0x24);
@@ -114,8 +115,9 @@ int com_read (char *buf_p, int *count_p){
 	strcpy(device->input, " ");
 	strcpy(device->output, " ");
 	device->status_code = 1;
-	int read_count = 0;
+	device->event_flag = 0;
 
+	int read_count = 0;
 	outb(COM1+1, 0x00); //disable interrupts
 	char letter = (device->ring_buffer)[0];
 	while(read_count < *count_p && letter != '\r' && letter != NULL)
@@ -123,9 +125,12 @@ int com_read (char *buf_p, int *count_p){
 		buf_p[read_count] = (device->ring_buffer)[read_count];
 		(device->ring_buffer)[read_count] = NULL;
 		read_count++;
+		letter = (device->ring_buffer)[read_count];
 	}
 	outb(COM1+4, 0x0B); //enable interrupts
+
 	device->status_code = 0;
+	device->event_flag = event_flag_copy;
 	*count_p = read_count;
 	return 0;
 }
@@ -140,9 +145,10 @@ int com_write (char *buf_p, int *count_p){
 	if(device->status_code != 0)
 		return -404;
 
-	strcpy(device->output, " ");
+	strcpy(device->output, buf_p);
 	device->write_count = *count_p;
 	device->status_code = 2;
+	device->event_flag = 0;
 
 	outb(COM1, buf_p[0]);
 	u32int old_ier = inb(COM1+1);
