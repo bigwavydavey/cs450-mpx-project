@@ -11,12 +11,9 @@
 #define PIC_COMM 0x20
 #define COM1_VECTOR 0x30
 
-extern void first_level_init_isr();
+extern void first_level_int_isr();
 
 struct dcb *device;
-char input[100];
-char output[100];
-char r_buffer[100];
 u32int old_handler;
 u32int old_mask;
 int com_open (int *eflag_p, int baud_rate){
@@ -30,7 +27,7 @@ int com_open (int *eflag_p, int baud_rate){
 		return -103;
 	
 	//2. Initialize the DCB
-	r_buffer = "\0";
+	
 	device = sys_alloc_mem(sizeof(struct dcb));
 	device->open_flag = 1;
 	device->event_flag = eflag_p;
@@ -41,13 +38,13 @@ int com_open (int *eflag_p, int baud_rate){
 	device->write_count = 0;
 	device->read_num_chars = 0;
 	device->write_num_chars = 0;
-	device->ring_buffer = r_buffer;
+	strcpy(device->ring_buffer, " ");
 	device->ring_buf_pos = 0;
 
 	//3. Save address of the current interrupt handler
 	//   Install new handler int interrupt vector
 	old_handler = idt_get_gate(0x24);
-	idt_set_gate(0x24, (u32int) first_level_init_isr, 0x08, 0x8e);
+	idt_set_gate(0x24, (u32int) first_level_int_isr, 0x08, 0x8e);
 
 	//4. Compute the baud rate divisor
 	int baud_rate_div = 115200 / (long) baud_rate;
@@ -114,10 +111,8 @@ int com_read (char *buf_p, int *count_p){
 	if(device->status_code != 0)
 		return -304;
 
-	input = "\0";
-	output = "\0";
-	device->input = input;
-	device->output = output;
+	strcpy(device->input, " ");
+	strcpy(device->output, " ");
 	device->status_code = 1;
 	int read_count = 0;
 
@@ -145,7 +140,7 @@ int com_write (char *buf_p, int *count_p){
 	if(device->status_code != 0)
 		return -404;
 
-	device->output = buf_p;
+	strcpy(device->output, " ");
 	device->write_count = *count_p;
 	device->status_code = 2;
 
