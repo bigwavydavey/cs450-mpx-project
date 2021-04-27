@@ -13,7 +13,7 @@
 
 extern void first_level_int_isr();
 
-struct dcb *device;
+extern struct dcb *device;
 u32int old_handler;
 int *event_flag_copy;
 u32int old_mask;
@@ -26,9 +26,9 @@ int com_open (int *eflag_p, int baud_rate){
 		return -102;
 	if (device != NULL)
 		return -103;
-	
+
 	//2. Initialize the DCB
-	
+
 	device = sys_alloc_mem(sizeof(struct dcb));
 	device->open_flag = 1;
 	device->event_flag = eflag_p;
@@ -61,7 +61,7 @@ int com_open (int *eflag_p, int baud_rate){
 
 	//7. Store value 0x03 in Line Control Register
 	outb(COM1+3, 0x03); //Write to Line Control
-	
+
 	//8. Enable PIC mask level 4
 	outb(COM1+1, 0x00); //disable interrupts
 	old_mask = inb(PIC_MASK);
@@ -97,7 +97,7 @@ int com_close (void){
 	outb(COM1+1, 0x00);
 	//5. Restore original saved interrupt vector
 	idt_set_gate(0x24, old_handler, 0x08, 0x8e);
-	
+
 
 	return 0;
 }

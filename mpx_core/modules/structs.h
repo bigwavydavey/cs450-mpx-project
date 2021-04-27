@@ -74,7 +74,7 @@ struct alarm
 */
 struct alarm_list
 {
-  int count;	
+  int count;
   struct alarm *head;
   struct alarm *tail;
 };
@@ -95,7 +95,7 @@ struct cmcb
 struct dcb
 {
 	int open_flag;
-	int *event_flag;
+	int event_flag;
 	//0 idle, 1 reading, 2 writing
 	int status_code;
 	char input[100];
@@ -115,8 +115,8 @@ struct iocb
 	struct pcb *process;
 	struct dcb *device;
 	int operation;
-	char buffer[100];
-	int buffer_size;
+	char *buffer;
+	int *buffer_size;
 	struct iocb *next;
 	struct iocb *prev;
 };
