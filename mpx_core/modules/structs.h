@@ -95,7 +95,7 @@ struct cmcb
 struct dcb
 {
 	int open_flag;
-	int event_flag;
+	int *event_flag;
 	//0 idle, 1 reading, 2 writing
 	int status_code;
 	char input[100];

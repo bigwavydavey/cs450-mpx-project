@@ -9,14 +9,14 @@
 
 #define PIC_MASK 0x21
 #define PIC_COMM 0x20
-#define COM1_VECTOR 0x30
 
 extern void first_level_int_isr();
 
-extern struct dcb *device;
+struct dcb *device;
 u32int old_handler;
 int *event_flag_copy;
 u32int old_mask;
+
 int com_open (int *eflag_p, int baud_rate){
 	//Steps from R6 Detailed
 	//1. Esnure that params are valid

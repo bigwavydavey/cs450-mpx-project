@@ -27,6 +27,7 @@
 #include "modules/internal_procedures.h"
 #include "modules/pcb_user_commands.h"
 #include "modules/R4processes.h"
+#include "modules/serial_port_driver.h"
 
 
 

@@ -9,6 +9,7 @@
 #include "internal_procedures.h"
 #include "structs.h"
 #include "R4processes.h"
+#include "newTestProcs.h"
 
 int buffer_size = 99;
 /**
@@ -533,6 +534,74 @@ void cmd_handler()
     else if(strcmp(cmd_buffer, "showmalloc") == 0)
       showAllocated();*/
     //Command not recognized
+    else if(strcmp(cmd_buffer, "comw") == 0)
+    {
+     struct pcb *comw_proc = SetupPCB("COMWRITE", 1, 8);
+      comw_proc -> state = 1;
+      struct context *comw_context = (struct context *)(comw_proc -> top);
+      memset(comw_context, 0, sizeof(struct context));
+      comw_context -> fs = 0x10;
+      comw_context -> gs = 0x10;
+      comw_context -> ds = 0x10;
+      comw_context -> es = 0x10;
+      comw_context -> cs = 0x8;
+      comw_context -> ebp = (u32int)(comw_proc-> stack);
+      comw_context -> esp = (u32int)(comw_proc -> top);
+      comw_context -> eip = (u32int)COMWRITE;
+      comw_context -> eflags = 0x202;
+      InsertPCB(comw_proc);
+    }
+    else if(strcmp(cmd_buffer, "comr") == 0)
+    {
+      struct pcb *comr_proc = SetupPCB("COMREAD", 1, 8);
+      comr_proc -> state = 1;
+      struct context *comr_context = (struct context *)(comr_proc -> top);
+      memset(comr_context, 0, sizeof(struct context));
+      comr_context -> fs = 0x10;
+      comr_context -> gs = 0x10;
+      comr_context -> ds = 0x10;
+      comr_context -> es = 0x10;
+      comr_context -> cs = 0x8;
+      comr_context -> ebp = (u32int)(comr_proc-> stack);
+      comr_context -> esp = (u32int)(comr_proc -> top);
+      comr_context -> eip = (u32int)COMREAD;
+      comr_context -> eflags = 0x202;
+      InsertPCB(comr_proc);
+    }
+    else if(strcmp(cmd_buffer, "iocom25") == 0)
+    {
+      struct pcb *iocom25_proc = SetupPCB("IOCOM25", 1, 8);
+      iocom25_proc -> state = 1;
+      struct context *iocom25_context = (struct context *)(iocom25_proc -> top);
+      memset(iocom25_context, 0, sizeof(struct context));
+      iocom25_context -> fs = 0x10;
+      iocom25_context -> gs = 0x10;
+      iocom25_context -> ds = 0x10;
+      iocom25_context -> es = 0x10;
+      iocom25_context -> cs = 0x8;
+      iocom25_context -> ebp = (u32int)(iocom25_proc-> stack);
+      iocom25_context -> esp = (u32int)(iocom25_proc -> top);
+      iocom25_context -> eip = (u32int)IOCOM25;
+      iocom25_context -> eflags = 0x202;
+      InsertPCB(iocom25_proc);
+    }
+    else if(strcmp(cmd_buffer, "iocom") == 0)
+    {
+      struct pcb *iocom_proc = SetupPCB("IOCOM", 1, 8);
+      iocom_proc -> state = 1;
+      struct context *iocom_context = (struct context *)(iocom_proc -> top);
+      memset(iocom_context, 0, sizeof(struct context));
+      iocom_context -> fs = 0x10;
+      iocom_context -> gs = 0x10;
+      iocom_context -> ds = 0x10;
+      iocom_context -> es = 0x10;
+      iocom_context -> cs = 0x8;
+      iocom_context -> ebp = (u32int)(iocom_proc-> stack);
+      iocom_context -> esp = (u32int)(iocom_proc -> top);
+      iocom_context -> eip = (u32int)IOCOM;
+      iocom_context -> eflags = 0x202;
+      InsertPCB(iocom_proc);
+    }
     else
     {
       optional_cmd_handler(cmd_buffer);
