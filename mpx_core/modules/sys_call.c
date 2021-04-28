@@ -6,7 +6,7 @@
 struct pcb* cop;
 struct context* reference;
 struct io_queue* io_queue;
-struct iocb* new_iocb = sys_alloc_mem(sizeof(struct iocb));
+//struct iocb* new_iocb = sys_alloc_mem(sizeof(struct iocb));
 
 /**
 * @brief Prepares the system for the next ready process to begin/resume execution
@@ -18,6 +18,7 @@ struct iocb* new_iocb = sys_alloc_mem(sizeof(struct iocb));
 u32int* sys_call(struct context *registers )
 {
   int com_ercode;
+  struct iocb* new_iocb = sys_alloc_mem(sizeof(struct iocb));
 
   struct pcb* temp = NULL;
   if( cop == NULL )
