@@ -536,7 +536,7 @@ void cmd_handler()
     else if(strcmp(cmd_buffer, "showmalloc") == 0)
       showAllocated();*/
     //Command not recognized
-    else if(strcmp(cmd_buffer, "comw") == 0)
+    /*else if(strcmp(cmd_buffer, "comw") == 0)
     {
      struct pcb *comw_proc = SetupPCB("COMWRITE", 1, 8);
       comw_proc -> state = 1;
@@ -603,7 +603,7 @@ void cmd_handler()
       iocom_context -> eip = (u32int)IOCOM;
       iocom_context -> eflags = 0x202;
       InsertPCB(iocom_proc);
-    }
+    }*/
     else
     {
       optional_cmd_handler(cmd_buffer);
