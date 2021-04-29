@@ -113,25 +113,25 @@ int com_read (char *buf_p, int *count_p){
 		return -304;
 
 	strcpy(device->input, " ");
-	strcpy(device->output, " ");
+	device->read_count = *count_p;
 	device->status_code = 1;
 	device->event_flag = 0;
 
-	int read_count = 0;
+	int real_read_count = 0;
 	outb(COM1+1, 0x00); //disable interrupts
 	char letter = (device->ring_buffer)[0];
-	while(read_count < *count_p && letter != '\r' && letter != NULL)
+	while(real_read_count < device->read_count && letter != '\r' && letter != NULL)
 	{
-		buf_p[read_count] = (device->ring_buffer)[read_count];
-		(device->ring_buffer)[read_count] = NULL;
-		read_count++;
-		letter = (device->ring_buffer)[read_count];
+		buf_p[real_read_count] = (device->ring_buffer)[real_read_count];
+		(device->ring_buffer)[real_read_count] = NULL;
+		real_read_count++;
+		letter = (device->ring_buffer)[real_read_count];
 	}
 	outb(COM1+4, 0x0B); //enable interrupts
 
 	device->status_code = 0;
 	device->event_flag = event_flag_copy;
-	*count_p = read_count;
+	*count_p = real_read_count;
 	return 0;
 }
 
