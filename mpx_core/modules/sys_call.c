@@ -101,13 +101,13 @@ u32int* sys_call(struct context *registers )
       if(new_iocb->operation == READ)
       {
         com_ercode = com_read(new_iocb->buffer, new_iocb->buffer_size);
-        cop->state = 1;
+        cop->state = 0;
         InsertPCB(cop);
       }
       else if(new_iocb->operation == WRITE)
       {
         com_ercode = com_write(new_iocb->buffer, new_iocb->buffer_size);
-        cop->state = 1;
+        cop->state = 0;
         InsertPCB(cop);
       }
     }
