@@ -6,6 +6,15 @@
 #include <core/io.h>
 #include "io_int_handlers.h"
 
+/**
+*	@brief This is level one of the 2-level
+*	       serial port interrupt handler,
+*		   which determines the exact cause of the
+*		   interrupt and performing some general
+*		   processing
+*	@param DCB: pointer to the device control block for COM1
+*	@retval void
+*/
 void first_level_int(struct dcb *DCB){
 	klogv("hello interrupt");
 	if (DCB->open_flag == 0){
@@ -21,6 +30,13 @@ void first_level_int(struct dcb *DCB){
 	outb(0x20, 0x20);
 }
 
+/**
+*	@brief This is level 2 of the 2-level
+*	       serial port interrupt handler,
+*		   which handles input interrupts
+*	@param DCB: pointer to the device control block for COM1
+*	@retval void
+*/
 int second_level_in(struct dcb *DCB){
 	char letter = inb(COM1);
 	if (DCB->status_code != 1){
@@ -47,6 +63,13 @@ int second_level_in(struct dcb *DCB){
 	}
 }
 
+/**
+*	@brief This is level 2 of the 2-level
+*	       serial port interrupt handler,
+*		   which handles output interrupts
+*	@param DCB: pointer to the device control block for COM1
+*	@retval void
+*/
 int second_level_out(struct dcb *DCB){
 	if (DCB->status_code != 2){
 		return -1;

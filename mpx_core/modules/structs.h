@@ -23,6 +23,10 @@ struct cmcb_queue
 	struct cmcb *tail;
 };
 
+/**
+* @brief This struct supports I/O queues
+*/
+
 struct io_queue
 {
 	int count;
@@ -92,6 +96,9 @@ struct cmcb
 	struct cmcb *prev;
 };
 
+/**
+* @brief This struct represents a device control block, to support I/O
+*/
 struct dcb
 {
 	int open_flag;
@@ -110,6 +117,10 @@ struct dcb
 	int ring_buf_pos;
 };
 
+/**
+* @brief This struct represents a particular process'
+*		 I/O request
+*/
 struct iocb
 {
 	struct pcb *process;

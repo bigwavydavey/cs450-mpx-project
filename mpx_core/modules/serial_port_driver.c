@@ -17,6 +17,17 @@ u32int old_handler;
 int *event_flag_copy;
 u32int old_mask;
 
+/**
+*	@brief Initializes a new device control block
+*		   to encapsulate the COM1 device, calculates
+*		   baud rate divisor and enables interrupts
+*	@param *eflag_p: pointer to event flag
+*   @param baud_rate: baud rate for the serial port connection
+*	@retval 0 if normal behavior
+*	@retval -101 if invalid event flag
+*	@retval -102 if invalid baud rate
+*	@retval -103 if device is already open
+*/
 int com_open (int *eflag_p, int baud_rate){
 	cli();
 	//Steps from R6 Detailed
@@ -79,6 +90,12 @@ int com_open (int *eflag_p, int baud_rate){
 	return 0;
 }
 
+/**
+*	@brief Terminates the serial port connection to COM1
+*	@param none
+*	@retval 0 if normal behavior
+*	@retval -201 if device is already closed
+*/
 int com_close (void){
 	//1. Ensure port is open
 	if(device.open_flag == 0)
@@ -104,6 +121,17 @@ int com_close (void){
 	return 0;
 }
 
+/**
+*	@brief Obtains characters from COM1 and loads them
+*		   into the requestor's buffer.
+*	@param *buf_p: pointer to requestor's buffer
+*   @param count_p: address if int number of characters to be read
+*	@retval 0 if normal behavior
+*	@retval -301 serial port already open
+*	@retval -302 if invalid character count
+*	@retval -303 if device is already open
+*   @retval -304 device is busy
+*/
 int com_read (char *buf_p, int *count_p){
 	if(device.open_flag == 0)
 		return -301;
@@ -141,6 +169,18 @@ int com_read (char *buf_p, int *count_p){
 	return 0;
 }
 
+/**
+*	@brief Initiates the transfer of a block of 
+		   data to the serial port.
+*	@param *buf_p: pointer to starting address of
+			the buffer containing blocks to be written
+*   @param count_p: pointer to int number of characters to be written
+*	@retval 0 if normal behavior
+*	@retval -401 serial port already open
+*	@retval -402 if invalid character count
+*	@retval -403 if device is already open
+*   @retval -404 device is busy
+*/
 int com_write (char *buf_p, int *count_p){
 	//cli();
 	klogv("hello");
