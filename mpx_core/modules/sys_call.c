@@ -39,7 +39,7 @@ u32int* sys_call(struct context *registers )
       FreePCB(cop);
     }
     else if( params.op_code == READ || params.op_code == WRITE ){
-        cop->state = 5;
+        cop->state = 2;
         InsertPCB(cop);
         new_iocb->process = cop;
         new_iocb->buffer = params.buffer_ptr;
@@ -68,10 +68,14 @@ u32int* sys_call(struct context *registers )
           if(params.op_code == READ)
           {
             com_ercode = com_read(new_iocb->buffer, new_iocb->buffer_size);
+            cop->state = 0;
+            InsertPCB(cop);
           }
           else if(params.op_code == WRITE)
           {
             com_ercode = com_write(new_iocb->buffer, new_iocb->buffer_size);
+            cop->state = 0;
+            InsertPCB(cop);
           }
         }
     }
@@ -97,10 +101,14 @@ u32int* sys_call(struct context *registers )
       if(new_iocb->operation == READ)
       {
         com_ercode = com_read(new_iocb->buffer, new_iocb->buffer_size);
+        cop->state = 1;
+        InsertPCB(cop);
       }
       else if(new_iocb->operation == WRITE)
       {
         com_ercode = com_write(new_iocb->buffer, new_iocb->buffer_size);
+        cop->state = 1;
+        InsertPCB(cop);
       }
     }
   }
