@@ -18,10 +18,10 @@ struct io_queue* io_queue;
 */
 u32int* sys_call(struct context *registers )
 {
-  int com_ercode;
-  struct iocb* new_iocb = sys_alloc_mem(sizeof(struct iocb));
+  //int com_ercode;
+  //struct iocb* new_iocb = sys_alloc_mem(sizeof(struct iocb));
 
-  //struct pcb* temp = NULL;
+  struct pcb* temp = NULL;
   if( cop == NULL )
   {
     reference = registers;
@@ -33,13 +33,13 @@ u32int* sys_call(struct context *registers )
     {
       cop->top = (unsigned char*)registers;
       cop->state = 0;
-      //temp = cop;
+      temp = cop;
       InsertPCB(cop);
     }
     else if( params.op_code == EXIT ){
       FreePCB(cop);
     }
-    else if( params.op_code == READ || params.op_code == WRITE ){
+    /*else if( params.op_code == READ || params.op_code == WRITE ){
         cop->state = 2;
         InsertPCB(cop);
         new_iocb->process = cop;
@@ -69,21 +69,21 @@ u32int* sys_call(struct context *registers )
           if(params.op_code == READ)
           {
             com_ercode = com_read(new_iocb->buffer, new_iocb->buffer_size);
-            /*cop->state = 0;
+            cop->state = 0;
             InsertPCB(cop);*/
-          }
+          /*}
           else if(params.op_code == WRITE)
           {
             klogv("first time");
             com_ercode = com_write(new_iocb->buffer, new_iocb->buffer_size);
-            /*cop->state = 0;
+            cop->state = 0;
             InsertPCB(cop);*/
-          }
+          /*}
         }
     }
-  }
+  }*/
 
-  if(com_ercode < 0){
+  /*if(com_ercode < 0){
     int buff = 10;
     sys_req(WRITE, DEFAULT_DEVICE, "com error", &buff);
   }
@@ -115,7 +115,7 @@ u32int* sys_call(struct context *registers )
         cop->state = 0;
         InsertPCB(cop);
       }
-    }
+    }*/
   }
 
 
@@ -125,8 +125,8 @@ u32int* sys_call(struct context *registers )
     struct pcb* rdy_process = ready_not_suspended.head;
     RemovePCB(rdy_process);
     rdy_process->state = 5;
-    /*if(temp != NULL)
-      InsertPCB(temp);*/
+    if(temp != NULL)
+      InsertPCB(temp);
     cop = rdy_process;
     return (u32int*)cop->top;
   }

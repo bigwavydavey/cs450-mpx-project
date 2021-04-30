@@ -29,7 +29,7 @@ u32int old_mask;
 *	@retval -103 if device is already open
 */
 int com_open (int *eflag_p, int baud_rate){
-	cli();
+	//cli();
 	//Steps from R6 Detailed
 	//1. Esnure that params are valid
 	if(eflag_p == NULL)
@@ -66,7 +66,7 @@ int com_open (int *eflag_p, int baud_rate){
 
 	outb(COM1+1, 0x00); //disable interrupts
 	//5. Store 0x80 in the Line Control Register
-	outb(COM1+3, 0x08); //Write to Line Control
+	outb(COM1+3, 0x80); //Write to Line Control
 
 	//6. Store high and low order bits of the baud rate divisor
 	outb(COM1 + 0, 115200/1200); //set bsd least sig bit
@@ -86,7 +86,7 @@ int com_open (int *eflag_p, int baud_rate){
 	//10. Enable input ready interrupts
 	outb(COM1+1, 0x01); //Write to Interrupt Enable
 	(void)inb(COM1);
-	sti();
+	//sti();
 	return 0;
 }
 

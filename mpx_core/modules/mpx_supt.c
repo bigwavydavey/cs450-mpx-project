@@ -173,14 +173,14 @@ int sys_free_mem(void *ptr)
 void idle()
 {
   char msg[30];
-  //int count=0;
+  int count=0;
 
 	memset( msg, '\0', sizeof(msg));
 	strcpy(msg, "\nIDLE PROCESS EXECUTING.\n");
-	//count = strlen(msg);
+	count = strlen(msg);
 
   while(1){
-	//sys_req( WRITE, DEFAULT_DEVICE, msg, &count);
+	sys_req( WRITE, DEFAULT_DEVICE, msg, &count);
     sys_req(IDLE, DEFAULT_DEVICE, NULL, NULL);
   }
 }
